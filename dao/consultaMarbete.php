@@ -140,11 +140,15 @@ function ContadorApu($marbete) {
             'trace' => $e->getTrace()
         ]);
     } finally {
-        // Liberar recursos
+        // Cerrar statements
         isset($stmt1) && $stmt1->close();
         isset($stmt2) && $stmt2->close();
         isset($stmt3) && $stmt3->close();
-        $con->desconectar();
+
+        // Cierra la conexión directamente si es mysqli
+        if(isset($conex) && $conex instanceof mysqli) {
+            $conex->close();
+        }
     }
 }
 ?>
