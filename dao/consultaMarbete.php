@@ -15,6 +15,10 @@ function ContadorApu($marbete)
     $con = new LocalConector();
     $conex = $con->conectar();
 
+    $Object = new DateTime();
+    $Object->setTimezone(new DateTimeZone('America/Denver'));
+    $DateAndTime = $Object->format("Y/m/d h:i:s");
+
     try {
         // 1. CONSULTA DATOS ORIGINALES (Storage_Unit)
         $stmt1 = $conex->prepare("SELECT `Id_StorageUnit`, `Numero_Parte`, `Cantidad`, `Storage_Bin`, `Storage_Type`, `Estatus`, `FolioMarbete`, `Conteo` 
@@ -45,8 +49,8 @@ function ContadorApu($marbete)
         if($existe == 0) {
             $stmt3 = $conex->prepare("INSERT INTO `Bitacora_Inventario` 
                                     (`NumeroParte`, `Fecha`, `StorageBin`, `StorageType`, `Area`) 
-                                    VALUES (?, NOW(), ?, ?, '1')");
-            $stmt3->bind_param("ssss", $row['Numero_Parte'], $row['Storage_Bin'], $row['Storage_Type']);
+                                    VALUES (?, ?, ?, ?, '1')");
+            $stmt3->bind_param("ssss", $row['Numero_Parte'],$DateAndTime, $row['Storage_Bin'], $row['Storage_Type']);
             $stmt3->execute();
         }
 
