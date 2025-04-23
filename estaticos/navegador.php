@@ -75,7 +75,10 @@ if ($tipoArea==0){
                         <a class="nav-link pl-3" href="crear_user.php"><span class="ml-1 item-text">Usuarios</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link pl-3" href="form_registro_coordinador.php"><span class="ml-1 item-text">Terceros conteos</span></a>
+                        <a class="nav-link pl-3" href="form_registro.php"><span class="ml-1 item-text">Captura SUN</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link pl-3" href="form_registro_produccion.php"><span class="ml-1 item-text">Captura Produccion</span></a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link pl-3" href="equipo_conteo.php"><span class="ml-1 item-text">Tu equipo de trabajo</span></a>
@@ -99,14 +102,7 @@ if ($tipoArea==0){
                     <span class="ml-3 item-text">Bases de datos</span>
                 </a>
                 <ul class="collapse list-unstyled pl-4 w-100 collapse show" id="bases">
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="control_areas_admin.php"><span class="ml-1 item-text">Areas</span></a>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="control_ubicaciones_admin.php"><span class="ml-1 item-text">Ubicaciones y bines</span></a>
-                    </li>
-                    
+                
                     <li class="nav-item">
                         <a class="nav-link pl-3" href="control_parte_admin.php"><span class="ml-1 item-text">Parte</span></a>
                     </li>
@@ -123,9 +119,6 @@ if ($tipoArea==0){
                     <span class="ml-3 item-text">Reportes</span>
                 </a>
                 <ul class="collapse list-unstyled pl-4 w-100 collapse show" id="reportes">
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="carga_descarga.php"><span class="ml-1 item-text">Reportes en txt</span></a>
-                    </li>
                     <li class="nav-item">
                         <a class="nav-link pl-3" href="reporte_diferencias.php"><span class="ml-1 item-text">Reportes de diferencias</span></a>
                     </li>
