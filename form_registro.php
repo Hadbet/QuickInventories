@@ -295,37 +295,44 @@ if (strlen($nomina) == 7) {
     }
 
     function manualMarbete() {
-
         var marbete = document.getElementById("scanner_input").value;
 
-        $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaMarbete.php?marbete='+marbete, function (data) {
-            if (data && data.data && data.data.length > 0) {
-                for (var i = 0; i < data.data.length; i++) {
+        // Limpiar el input después de obtener el valor
+        limpiarEscan();
 
-                    numeroParte=data.data[i].Numero_Parte;
-                    storageBin=data.data[i].Storage_Bin;
-                    storageType=data.data[i].Storage_Type;
+        $.ajax({
+            url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaMarbete.php',
+            type: 'GET',
+            dataType: 'json',
+            data: { marbete: marbete },
+            success: function(data) {
+                if (data.success && data.data && data.data.length > 0) {
+                    var item = data.data[0]; // Tomamos el primer elemento
 
                     document.getElementById("reader").style.display = 'none';
-                    document.getElementById("Ubicacion").innerHTML = "Ubicación : "+storageBin;
-                    document.getElementById("txtNumeroParteA").value = numeroParte;
-                    document.getElementById("txtNumeroParteAgregar").value = numeroParte;
+                    document.getElementById("Ubicacion").innerHTML = "Ubicación: " + item.Storage_Bin;
+                    document.getElementById("txtNumeroParteA").value = item.Numero_Parte;
+                    document.getElementById("txtNumeroParteAgregar").value = item.Numero_Parte;
                     document.getElementById("pasoDos").style.display = 'block';
                     document.getElementById("pasoUno").style.display = 'none';
 
                     document.getElementById('txtStorageUnit').focus();
-
-                    limpiarEscan();
-
+                } else {
+                    Swal.fire({
+                        title: data.message || "El marbete no está cargado",
+                        text: "Verifícalo con la mesa central",
+                        icon: "error"
+                    });
                 }
-            }else{
+            },
+            error: function(xhr, status, error) {
                 Swal.fire({
-                    title: "El marbete no esta cargado",
-                    text: "Verificalo con la mesa central",
+                    title: "Error de conexión",
+                    text: "No se pudo consultar el marbete. Intenta nuevamente.",
                     icon: "error"
                 });
+                console.error("Error en consulta:", status, error);
             }
-
         });
     }
 
