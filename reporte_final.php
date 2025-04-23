@@ -271,7 +271,7 @@ if (strlen($nomina) == 7) {
 
     estatusConteo();
     function estatusConteo() {
-        $.getJSON('https://grammermx.com/Logistica/Inventario2024/dao/consultaReporteFinalDetalles.php', function (data) {
+        $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaReporteFinalDetalles.php', function (data) {
             for (var i = 0; i < data.data.length; i++) {
 
                 document.getElementById("costoNegativo").innerText = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(data.data[i].Costo_Total_Negativo);
@@ -325,7 +325,7 @@ if (strlen($nomina) == 7) {
     });
 
     function inicioTabla() {
-        $.getJSON('https://grammermx.com/Logistica/Inventario2024/dao/consultaReporteFinal.php', function (data) {
+        $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaReporteFinal.php', function (data) {
             var table = document.getElementById("data-table");
             var totalSap = 0;
             var totalConteo = 0;
@@ -368,8 +368,6 @@ if (strlen($nomina) == 7) {
     }
 </script>
 <script src="js/apps.js"></script>
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
 
@@ -418,9 +416,9 @@ if (strlen($nomina) == 7) {
 
     async function loadData() {
         try {
-            const dataUno = await fetchData('https://grammermx.com/Logistica/Inventario2024/dao/consultaReporteFinalUno.php');
-            const dataDos = await fetchData('https://grammermx.com/Logistica/Inventario2024/dao/consultaReporteFinalDos.php');
-            const dataTres = await fetchData('https://grammermx.com/Logistica/Inventario2024/dao/consultaReporteFinalTres.php');
+            const dataUno = await fetchData('https://grammermx.com/Logistica/QuickInventories/dao/consultaReporteFinalUno.php');
+            const dataDos = await fetchData('https://grammermx.com/Logistica/QuickInventories/dao/consultaReporteFinalDos.php');
+            const dataTres = await fetchData('https://grammermx.com/Logistica/QuickInventories/dao/consultaReporteFinalTres.php');
 
             let formattedData = [];
             formattedData = formattedData.concat(await processAndAppendData(dataUno, 'uno'));

@@ -131,7 +131,6 @@ if (strlen($nomina) == 7) {
 <script src="js/apps.js"></script>
 <script src="assets/scanapp.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
 <script src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.flash.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
@@ -147,7 +146,7 @@ if (strlen($nomina) == 7) {
 
     function verificacionDiferencia() {
 
-        $.getJSON('https://grammermx.com/Logistica/Inventario2024/dao/consultaSegundosConteosCostoAdmin.php', function (data) {
+        $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaSegundosConteosCostoAdmin.php', function (data) {
 
             if (data && data.data && data.data.length > 0) {
                 for (var i = 0; i < data.data.length; i++) {
@@ -167,7 +166,7 @@ if (strlen($nomina) == 7) {
 
     function crearTabla() {
         $.ajax({
-            url: 'https://grammermx.com/Logistica/Inventario2024/dao/consultaSegundosConteosCostoAdminAux.php', // Reemplaza esto con la URL de tus datos
+            url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaSegundosConteosCostoAdminAux.php', // Reemplaza esto con la URL de tus datos
             dataType: 'json',
             success: function(data) {
 

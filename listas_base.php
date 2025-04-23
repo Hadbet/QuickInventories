@@ -84,7 +84,7 @@
 
 <script>
     $.ajax({
-        url: 'https://grammermx.com/Logistica/Inventario2024/dao/consultaAuditor.php', // Reemplaza esto con la URL de tus datos
+        url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaAuditor.php', // Reemplaza esto con la URL de tus datos
         dataType: 'json',
         success: function(data) {
             var table = $('#dataTable-1').DataTable({
@@ -147,8 +147,6 @@
     });
 </script>
 <script src="js/apps.js"></script>
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
 

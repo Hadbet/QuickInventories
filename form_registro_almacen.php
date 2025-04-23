@@ -197,7 +197,6 @@ if (strlen($nomina) == 7) {
 <script src="js/apps.js"></script>
 <script src="assets/scanapp.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
 
 <script>
 
@@ -207,7 +206,7 @@ if (strlen($nomina) == 7) {
     var auxStorage=0;
     estatusConteo();
     function estatusConteo() {
-        $.getJSON('https://grammermx.com/Logistica/Inventario2024/dao/consultaAreaDetalle.php?area=<?php echo $area;?>', function (data) {
+        $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaAreaDetalle.php?area=<?php echo $area;?>', function (data) {
             for (var i = 0; i < data.data.length; i++) {
                 auxConteo = data.data[i].Conteo;
                 auxStorage = data.data[i].StBin
@@ -220,7 +219,7 @@ if (strlen($nomina) == 7) {
     var bandera=0;
 
     function cargarNumeroParte(numeroParteF,storageBinF) {
-        $.getJSON('https://grammermx.com/Logistica/Inventario2024/dao/consultaParte.php?parte='+numeroParteF, function (data) {
+        $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaParte.php?parte='+numeroParteF, function (data) {
             for (var i = 0; i < data.data.length; i++) {
                 if (data.data[i].GrammerNo) {
                     document.getElementById('lblNumeroParte').innerText = data.data[i].GrammerNo;
@@ -324,7 +323,7 @@ if (strlen($nomina) == 7) {
         var marbete = parseInt(document.getElementById("scanner_input").value.split('.')[0], 10);
 
         if (document.getElementById("scanner_input").value.split('.')[1] === auxConteo){
-            $.getJSON('https://grammermx.com/Logistica/Inventario2024/dao/consultaMarbete.php?marbete='+marbete, function (data) {
+            $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaMarbete.php?marbete='+marbete, function (data) {
                 if (data && data.data && data.data.length > 0) {
                     for (var i = 0; i < data.data.length; i++) {
                         if (data.data[i].FolioMarbete) {
@@ -402,7 +401,7 @@ if (strlen($nomina) == 7) {
         formData.append('cantidad', cantidad);
         formData.append('storageBin', storageBin);
 
-        fetch('https://grammermx.com/Logistica/Inventario2024/dao/guardarMarbeteProduccion.php', {
+        fetch('https://grammermx.com/Logistica/QuickInventories/dao/guardarMarbeteProduccion.php', {
             method: 'POST',
             body: formData
         })
@@ -450,7 +449,7 @@ if (strlen($nomina) == 7) {
         var inputValue = this.value;
         document.getElementById('lblNumeroParte').textContent = inputValue;
         if (event.key === 'Enter' || event.keyCode === 13) {
-            $.getJSON('https://grammermx.com/Logistica/Inventario2024/dao/consultaParte.php?parte='+this.value, function (data) {
+            $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaParte.php?parte='+this.value, function (data) {
                 if (data && data.data && data.data.length > 0) {
                     for (var i = 0; i < data.data.length; i++) {
                         if (data.data[i].GrammerNo) {
@@ -490,7 +489,7 @@ if (strlen($nomina) == 7) {
     document.getElementById('txtStorageBin').addEventListener('keyup', function(event) {
         if (event.key === 'Enter' || event.keyCode === 13) {
             if (document.getElementById("txtStorageBin").value!==""){
-                $.getJSON('https://grammermx.com/Logistica/Inventario2024/dao/consultaTypes.php?bin='+document.getElementById("txtStorageBin").value, function (data) {
+                $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaTypes.php?bin='+document.getElementById("txtStorageBin").value, function (data) {
                     if (data && data.data && data.data.length > 0) {
                         for (var i = 0; i < data.data.length; i++) {
                             document.getElementById('btnFin').disabled = false;

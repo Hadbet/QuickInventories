@@ -132,7 +132,7 @@ if (strlen($nomina) == 7) {
 
     llenarAreas();
     function llenarAreas() {
-        $.getJSON('https://grammermx.com/Logistica/Inventario2024/dao/consultaArea.php', function (data) {
+        $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaArea.php', function (data) {
             for (var i = 0; i < data.data.length; i++) {
                 var option = $('<option/>');
                 option.attr({ 'value': data.data[i].IdArea }).text(data.data[i].AreaNombre);
@@ -183,7 +183,7 @@ if (strlen($nomina) == 7) {
     });
 
     function inicioTabla() {
-        $.getJSON('https://grammermx.com/Logistica/Inventario2024/dao/consultaReporteFinal.php', function (data) {
+        $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaReporteFinal.php', function (data) {
             var table = document.getElementById("data-table");
             var totalSap = 0;
             var totalConteo = 0;
@@ -226,8 +226,6 @@ if (strlen($nomina) == 7) {
     }
 </script>
 <script src="js/apps.js"></script>
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
 
@@ -278,9 +276,9 @@ if (strlen($nomina) == 7) {
     async function loadData() {
         try {
             var area = document.getElementById("cbArea").value;
-            const dataUno = await fetchData('https://grammermx.com/Logistica/Inventario2024/dao/consultaReporteFinalUnoArea.php?area='+area);
-            const dataDos = await fetchData('https://grammermx.com/Logistica/Inventario2024/dao/consultaReporteFinalDosArea.php?area='+area);
-            const dataTres = await fetchData('https://grammermx.com/Logistica/Inventario2024/dao/consultaReporteFinalTresArea.php?area='+area);
+            const dataUno = await fetchData('https://grammermx.com/Logistica/QuickInventories/dao/consultaReporteFinalUnoArea.php?area='+area);
+            const dataDos = await fetchData('https://grammermx.com/Logistica/QuickInventories/dao/consultaReporteFinalDosArea.php?area='+area);
+            const dataTres = await fetchData('https://grammermx.com/Logistica/QuickInventories/dao/consultaReporteFinalTresArea.php?area='+area);
 
             let formattedData = [];
             formattedData = formattedData.concat(await processAndAppendData(dataUno, 'uno'));

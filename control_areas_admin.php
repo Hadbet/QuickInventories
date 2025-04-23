@@ -203,7 +203,7 @@ if (strlen($nomina) == 7) {
     <?php include 'estaticos/scriptEstandar.php'; ?>
     <script>
               $.ajax({
-                url: 'https://grammermx.com/Logistica/Inventario2024/dao/consultaAreaAdmin.php', // Reemplaza esto con la URL de tus datos
+                url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaAreaAdmin.php', // Reemplaza esto con la URL de tus datos
                 dataType: 'json',
                 success: function(data) {
                   $('#dataTable-1').DataTable({
@@ -227,8 +227,6 @@ if (strlen($nomina) == 7) {
               });
     </script>
     <script src="js/apps.js"></script>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
 
@@ -241,7 +239,7 @@ if (strlen($nomina) == 7) {
 
       function actualizarTabla() {
           $.ajax({
-              url: 'https://grammermx.com/Logistica/Inventario2024/dao/consultaAreaAdmin.php', // Reemplaza esto con la URL de tus datos
+              url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaAreaAdmin.php', // Reemplaza esto con la URL de tus datos
               dataType: 'json',
               success: function(data) {
                   var table = $('#dataTable-1').DataTable();
@@ -268,7 +266,7 @@ if (strlen($nomina) == 7) {
           formData.append('bin', bin);
           formData.append('conteo', conteo);
 
-          fetch('https://grammermx.com/Logistica/Inventario2024/dao/guardarArea.php', {
+          fetch('https://grammermx.com/Logistica/QuickInventories/dao/guardarArea.php', {
               method: 'POST',
               body: formData
           })

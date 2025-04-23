@@ -146,7 +146,7 @@ $result = $stmt->get_result();
 
     <script>
               $.ajax({
-                url: 'https://grammermx.com/Logistica/Inventario2024/dao/consultaMarbeteLider.php?area=<?php echo $area; ?>', // Reemplaza esto con la URL de tus datos
+                url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaMarbeteLider.php?area=<?php echo $area; ?>', // Reemplaza esto con la URL de tus datos
                 dataType: 'json',
                 success: function(data) {
                   $('#dataTable-1').DataTable({
@@ -170,8 +170,6 @@ $result = $stmt->get_result();
               });
     </script>
     <script src="js/apps.js"></script>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
 
@@ -184,7 +182,7 @@ $result = $stmt->get_result();
 
       function actualizarTabla() {
           $.ajax({
-              url: 'https://grammermx.com/Logistica/Inventario2024/dao/consultaMarbeteLider.php?area=<?php echo $area; ?>', // Reemplaza esto con la URL de tus datos
+              url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaMarbeteLider.php?area=<?php echo $area; ?>', // Reemplaza esto con la URL de tus datos
               dataType: 'json',
               success: function(data) {
                   var table = $('#dataTable-1').DataTable();
@@ -213,7 +211,7 @@ $result = $stmt->get_result();
               formData.append('id', id);
               formData.append('comentario', comentario);
 
-              fetch('https://grammermx.com/Logistica/Inventario2024/dao/guardarCancelacion.php', {
+              fetch('https://grammermx.com/Logistica/QuickInventories/dao/guardarCancelacion.php', {
                   method: 'POST',
                   body: formData
               })

@@ -12,9 +12,9 @@
   </head>
   <body class="vertical  light  ">
     <div class="wrapper">
-      <?php
-            require_once('estaticos/navegador.php');
-    ?>
+        <?php
+        require_once('estaticos/navegador.php');
+        ?>
       <main role="main" class="main-content">
         <div class="container-fluid">
           <div class="row justify-content-center">
@@ -255,7 +255,7 @@
 
 
               $.ajax({
-                url: 'https://grammermx.com/Logistica/Inventario2024/dao/consultaUser.php', // Reemplaza esto con la URL de tus datos
+                url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaUser.php', // Reemplaza esto con la URL de tus datos
                 dataType: 'json',
                 success: function(data) {
                   $('#dataTable-1').DataTable({
@@ -279,8 +279,6 @@
               });
     </script>
     <script src="js/apps.js"></script>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
 
@@ -325,7 +323,7 @@
               table.deleteRow(1);
           }
 
-          $.getJSON('https://grammermx.com/Logistica/Inventario2024/dao/consultaDetalles.php?marbete='+folio, function (data) {
+          $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaDetalles.php?marbete='+folio, function (data) {
               for (var i = 0; i < data.data.length; i++) {
                   var row = table.insertRow(-1);
                   var cell1 = row.insertCell(0);
@@ -357,7 +355,7 @@
           formData.append('nombre', nombre);
           formData.append('nomina', nomina);
 
-          fetch('https://grammermx.com/Logistica/Inventario2024/dao/guardarUsuario.php', {
+          fetch('https://grammermx.com/Logistica/QuickInventories/dao/guardarUsuario.php', {
               method: 'POST',
               body: formData
           })
@@ -381,7 +379,7 @@
 
       function actualizarTabla() {
           $.ajax({
-              url: 'https://grammermx.com/Logistica/Inventario2024/dao/consultaUser.php', // Reemplaza esto con la URL de tus datos
+              url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaUser.php', // Reemplaza esto con la URL de tus datos
               dataType: 'json',
               success: function(data) {
                   var table = $('#dataTable-1').DataTable();
@@ -398,7 +396,7 @@
           formData.append('id', id);
           formData.append('estado', estado);
 
-          fetch('https://grammermx.com/Logistica/Inventario2024/dao/guardarEstatus.php', {
+          fetch('https://grammermx.com/Logistica/QuickInventories/dao/guardarEstatus.php', {
               method: 'POST',
               body: formData
           })
@@ -411,7 +409,7 @@
 
       llenarAreas();
       function llenarAreas() {
-          $.getJSON('https://grammermx.com/Logistica/Inventario2024/dao/consultaArea.php', function (data) {
+          $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaArea.php', function (data) {
               for (var i = 0; i < data.data.length; i++) {
                   var option = $('<option/>');
                   option.attr({ 'value': data.data[i].IdArea }).text(data.data[i].AreaNombre);
@@ -437,7 +435,7 @@
           formData.append('password', password);
           formData.append('id', id);
 
-          fetch('https://grammermx.com/Logistica/Inventario2024/dao/actualizarUsuario.php', {
+          fetch('https://grammermx.com/Logistica/QuickInventories/dao/actualizarUsuario.php', {
               method: 'POST',
               body: formData
           })
@@ -527,7 +525,7 @@
           var formData = new FormData();
           formData.append('estado', estado);
 
-          fetch('https://grammermx.com/Logistica/Inventario2024/dao/masivoUsuarios.php', {
+          fetch('https://grammermx.com/Logistica/QuickInventories/dao/masivoUsuarios.php', {
               method: 'POST',
               body: formData
           })

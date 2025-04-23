@@ -90,7 +90,6 @@ if (strlen($nomina) == 7) {
 <script src="js/apps.js"></script>
 <script src="assets/scanapp.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
 <script src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.flash.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
@@ -104,7 +103,7 @@ if (strlen($nomina) == 7) {
     crearTabla();
     function crearTabla() {
         $.ajax({
-            url: 'https://grammermx.com/Logistica/Inventario2024/dao/consultaInventarioSap.php', // Reemplaza esto con la URL de tus datos
+            url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaInventarioSap.php', // Reemplaza esto con la URL de tus datos
             dataType: 'json',
             success: function(data) {
                 var table = $('#dataTable-1').DataTable({

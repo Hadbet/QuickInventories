@@ -210,7 +210,7 @@ $result = $stmt->get_result();
 
     <script>
               $.ajax({
-                url: 'https://grammermx.com/Logistica/Inventario2024/dao/consultaCapturista.php', // Reemplaza esto con la URL de tus datos
+                url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaCapturista.php', // Reemplaza esto con la URL de tus datos
                 dataType: 'json',
                 success: function(data) {
                   $('#dataTable-1').DataTable({
@@ -232,8 +232,6 @@ $result = $stmt->get_result();
               });
     </script>
     <script src="js/apps.js"></script>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
 
@@ -257,7 +255,7 @@ $result = $stmt->get_result();
               table.deleteRow(1);
           }
 
-          $.getJSON('https://grammermx.com/Logistica/Inventario2024/dao/consultaDetalles.php?marbete='+folio, function (data) {
+          $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaDetalles.php?marbete='+folio, function (data) {
               for (var i = 0; i < data.data.length; i++) {
                   var row = table.insertRow(-1);
                   var cell1 = row.insertCell(0);

@@ -194,7 +194,7 @@ if (strlen($nomina) == 7) {
     <script>
 
               $.ajax({
-                url: 'https://grammermx.com/Logistica/Inventario2024/dao/consultaUbicacionAdmin.php', // Reemplaza esto con la URL de tus datos
+                url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaUbicacionAdmin.php', // Reemplaza esto con la URL de tus datos
                 dataType: 'json',
                 success: function(data) {
                   $('#dataTable-1').DataTable({
@@ -215,7 +215,7 @@ if (strlen($nomina) == 7) {
 
 
               $.ajax({
-                  url: 'https://grammermx.com/Logistica/Inventario2024/dao/consultaBinAdmin.php', // Reemplaza esto con la URL de tus datos
+                  url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaBinAdmin.php', // Reemplaza esto con la URL de tus datos
                   dataType: 'json',
                   success: function(data) {
                       $('#dataTable-2').DataTable({
@@ -236,8 +236,6 @@ if (strlen($nomina) == 7) {
 
     </script>
     <script src="js/apps.js"></script>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
 
@@ -250,7 +248,7 @@ if (strlen($nomina) == 7) {
 
       function actualizarTabla() {
           $.ajax({
-              url: 'https://grammermx.com/Logistica/Inventario2024/dao/consultaUbicacionAdmin.php', // Reemplaza esto con la URL de tus datos
+              url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaUbicacionAdmin.php', // Reemplaza esto con la URL de tus datos
               dataType: 'json',
               success: function(data) {
                   var table = $('#dataTable-1').DataTable();
@@ -263,7 +261,7 @@ if (strlen($nomina) == 7) {
 
       function actualizarTablaDos() {
           $.ajax({
-              url: 'https://grammermx.com/Logistica/Inventario2024/dao/consultaBinAdmin.php', // Reemplaza esto con la URL de tus datos
+              url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaBinAdmin.php', // Reemplaza esto con la URL de tus datos
               dataType: 'json',
               success: function(data) {
                   var tableDos = $('#dataTable-2').DataTable();
@@ -284,7 +282,7 @@ if (strlen($nomina) == 7) {
               formData.append('pvb', pvb);
               formData.append('tipo', tipo);
 
-              fetch('https://grammermx.com/Logistica/Inventario2024/dao/guardarUbicacionP.php', {
+              fetch('https://grammermx.com/Logistica/QuickInventories/dao/guardarUbicacionP.php', {
                   method: 'POST',
                   body: formData
               })
@@ -322,7 +320,7 @@ if (strlen($nomina) == 7) {
               formData.append('stType', type);
               formData.append('tipo', tipo);
 
-              fetch('https://grammermx.com/Logistica/Inventario2024/dao/guardarBinP.php', {
+              fetch('https://grammermx.com/Logistica/QuickInventories/dao/guardarBinP.php', {
                   method: 'POST',
                   body: formData
               })
