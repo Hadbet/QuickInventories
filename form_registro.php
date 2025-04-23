@@ -626,7 +626,7 @@ if (strlen($nomina) == 7) {
         formData.append('nombre', '<?php echo $nomina;?>-<?php echo $nombre;?>');
         formData.append('comentarios', comentarios);
         formData.append('storageUnits', JSON.stringify(storageUnits));
-        formData.append('folioMarbete', folioMarbete);
+        formData.append('folioMarbete', idMarbete);
 
         fetch('https://grammermx.com/Logistica/QuickInventories/dao/guardarMarbete.php', {
             method: 'POST',
