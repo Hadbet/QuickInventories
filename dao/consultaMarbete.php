@@ -32,6 +32,7 @@ ContadorApu($marbete);
 function ContadorApu($marbete) {
     $con = new LocalConector();
     $conex = $con->conectar();
+    $id_bitacora = null; // Variable para almacenar el ID del registro insertado
 
     if($conex->connect_error) {
         error_log("Error de conexión: " . $conex->connect_error);
@@ -116,7 +117,9 @@ function ContadorApu($marbete) {
                 throw new Exception("Error al insertar en bitácora: " . $stmt3->error);
             }
 
-            error_log("Inserción exitosa en bitácora");
+            // Obtener el ID del registro insertado
+            $id_bitacora = $conex->insert_id;
+            error_log("Inserción exitosa en bitácora. ID generado: " . $id_bitacora);
         }
 
         // 4. RESPUESTA EXITOSA
@@ -124,9 +127,11 @@ function ContadorApu($marbete) {
         echo json_encode([
             'success' => true,
             'data' => $datos_originales,
+            'bitacora_id' => $id_bitacora, // Incluir el ID del registro en bitácora
             'debug' => [
                 'marbete_buscado' => $marbete,
-                'registros_encontrados' => count($datos_originales)
+                'registros_encontrados' => count($datos_originales),
+                'bitacora_insertada' => ($id_bitacora !== null)
             ]
         ]);
 

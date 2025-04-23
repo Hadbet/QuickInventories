@@ -266,6 +266,7 @@ if (strlen($nomina) == 7) {
     var numeroParte;
     var storageBin;
     var storageType;
+    var idMarbete;
 
     var numeroParteUnit;
     var cantidad;
@@ -308,6 +309,7 @@ if (strlen($nomina) == 7) {
 
                     numeroParte=item.Numero_Parte;
                     storageBin=item.Storage_Bin;
+                    idMarbete = data.bitacora_id;
 
                     document.getElementById("reader").style.display = 'none';
                     document.getElementById("Ubicacion").innerHTML = "Ubicación: " + item.Storage_Bin;

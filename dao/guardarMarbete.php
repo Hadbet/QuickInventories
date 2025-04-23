@@ -8,8 +8,7 @@ try {
 
     $parts = explode('.', $folioMarbete);
 
-    $marbete = intval($parts[0]); // Esto es equivalente a parseInt() en JavaScript
-    $conteo = isset($parts[1]) ? $parts[1] : null;
+    $marbete = intval($parts[0]);
 
     $con = new LocalConector();
     $conex=$con->conectar();
@@ -19,13 +18,7 @@ try {
     $Object->setTimezone(new DateTimeZone('America/Denver'));
     $DateAndTime = $Object->format("Y/m/d h:i:s");
 
-    if ($conteo == 1) {
-        $stmt = $conex->prepare("UPDATE `Bitacora_Inventario` SET  `Usuario`=?, `Estatus`='2', `PrimerConteo`=?,`Comentario`=? WHERE `FolioMarbete`=? AND `Estatus` = 0");
-    } elseif ($conteo == 2) {
-        $stmt = $conex->prepare("UPDATE `Bitacora_Inventario` SET  `UserSeg`=?, `SegundoConteo`=?, `SegFolio`=1 WHERE `FolioMarbete`=? AND `Estatus` = 1");
-    } elseif ($conteo == 3) {
-        $stmt = $conex->prepare("UPDATE `Bitacora_Inventario` SET  `TercerConteo`=? WHERE `FolioMarbete`=? AND `Estatus` = 1");
-    }
+    $stmt = $conex->prepare("UPDATE `Bitacora_Inventario` SET  `Usuario`=?, `Estatus`='2', `PrimerConteo`=?,`Comentario`=? WHERE `FolioMarbete`=? AND `Estatus` = 0");
 
     $totalCantidad = 0;
 
@@ -35,36 +28,16 @@ try {
         $totalCantidad += $cantidad;
     }
 
-    $primerConteo = $conteo == 1 ? $totalCantidad : 0;
-    $segundoConteo = $conteo == 2 ? $totalCantidad : 0;
-    $tercerConteo = $conteo == 3 ? $totalCantidad : 0;
-
-    if ($conteo == 1) {
-        $stmt->bind_param("ssss",  $nombre, $primerConteo, $comentarios, $marbete);
-    } elseif ($conteo == 2) {
-        $stmt->bind_param("sss",  $nombre, $segundoConteo, $marbete);
-    } elseif ($conteo == 3) {
-        $stmt->bind_param("ss",$tercerConteo, $marbete);
-    }
-
-
-
+    $stmt->bind_param("ssss",  $nombre, $totalCantidad, $comentarios, $marbete);
 
     if (!$stmt->execute()) {
         echo json_encode(["success" => false]);
         throw new Exception('Error al ejecutar la consulta');
     } else {
-
-        $stmt3 = $conex->prepare("UPDATE `Storage_Unit` SET `Estatus`='0' WHERE `FolioMarbete`=?");
-        $stmt3->bind_param("s", $marbete);
-        $stmt3->execute();
-        $stmt3->close();
-
-
-        $stmt2 = $conex->prepare("UPDATE `Storage_Unit` SET `Estatus`='1',`Conteo`=?,`FolioMarbete`=?,`Cantidad`=? WHERE `Id_StorageUnit` = ?");
+        $stmt2 = $conex->prepare("UPDATE `Storage_Unit` SET `Estatus`='1',`Conteo`='1',`FolioMarbete`=?,`Cantidad`=? WHERE `Id_StorageUnit` = ?");
         foreach ($storageUnits as $storageUnit => $details) {
             $cantidad = $details['cantidad'];
-            $stmt2->bind_param("ssss", $conteo,$marbete,$cantidad,$storageUnit);
+            $stmt2->bind_param("sss",$marbete,$cantidad,$storageUnit);
             $stmt2->execute();
         }
         $stmt2->close();
