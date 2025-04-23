@@ -44,9 +44,9 @@ function ContadorApu($marbete)
         // 3. INSERTAR SI NO EXISTE (operación silenciosa)
         if($existe == 0) {
             $stmt3 = $conex->prepare("INSERT INTO `Bitacora_Inventario` 
-                                    (`NumeroParte`, `Fecha`, `StorageBin`, `StorageType`, `Area`, `FolioMarbete`) 
-                                    VALUES (?, NOW(), ?, ?, '1', ?)");
-            $stmt3->bind_param("ssss", $row['Numero_Parte'], $row['Storage_Bin'], $row['Storage_Type'], $marbete);
+                                    (`NumeroParte`, `Fecha`, `StorageBin`, `StorageType`, `Area`) 
+                                    VALUES (?, NOW(), ?, ?, '1')");
+            $stmt3->bind_param("ssss", $row['Numero_Parte'], $row['Storage_Bin'], $row['Storage_Type']);
             $stmt3->execute();
         }
 
