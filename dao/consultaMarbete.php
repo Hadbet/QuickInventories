@@ -1,109 +1,73 @@
 <?php
-// Cabeceras iniciales para asegurar respuesta JSON
-header('Content-Type: application/json');
-http_response_code(200); // Establecemos código 200 por defecto
-
 include_once('db/db_Inventario.php');
 
-// Validar y sanitizar el parámetro de entrada
 $marbete = isset($_GET['marbete']) ? trim($_GET['marbete']) : '';
 
 if(empty($marbete)) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'El parámetro marbete es requerido'
-    ]);
-    exit;
+    http_response_code(400);
+    die(json_encode(array("success" => false, "message" => "El parámetro marbete es requerido")));
 }
 
-// Función principal
-try {
+ContadorApu($marbete);
+
+function ContadorApu($marbete)
+{
     $con = new LocalConector();
     $conex = $con->conectar();
 
-    // 1. CONSULTA PRINCIPAL - Obtener datos del marbete
-    $stmt = $conex->prepare("SELECT 
-                            `Id_StorageUnit`, 
-                            `Numero_Parte`, 
-                            `Cantidad`, 
-                            `Storage_Bin`, 
-                            `Storage_Type`, 
-                            `Estatus`, 
-                            `FolioMarbete`, 
-                            `Conteo` 
-                          FROM `Storage_Unit` 
-                          WHERE `Id_StorageUnit` = ?");
+    $Object = new DateTime();
+    $Object->setTimezone(new DateTimeZone('America/Denver'));
+    $DateAndTime = $Object->format("Y/m/d h:i:s");
 
-    if(!$stmt) {
-        throw new Exception('Error al preparar consulta: ' . $conex->error);
+    try {
+        // 1. CONSULTA DATOS ORIGINALES (Storage_Unit)
+        $stmt1 = $conex->prepare("SELECT `Id_StorageUnit`, `Numero_Parte`, `Cantidad`, `Storage_Bin`, `Storage_Type`, `Estatus`, `FolioMarbete`, `Conteo` 
+                                 FROM `Storage_Unit` 
+                                 WHERE `Id_StorageUnit` = ?");
+        $stmt1->bind_param("s", $marbete);
+        $stmt1->execute();
+        $result1 = $stmt1->get_result();
+
+        if($result1->num_rows === 0) {
+            http_response_code(404);
+            die(json_encode(array("success" => false, "message" => "No se encontró el marbete especificado")));
+        }
+
+        $datos_originales = $result1->fetch_all(MYSQLI_ASSOC);
+
+        // 2. VERIFICAR EN BITÁCORA
+        $row = $datos_originales[0];
+        $stmt2 = $conex->prepare("SELECT COUNT(*) as existe 
+                                FROM `Bitacora_Inventario` 
+                                WHERE `NumeroParte` = ? 
+                                AND `StorageBin` = ? 
+                                AND `StorageType` = ?");
+        $stmt2->bind_param("sss", $row['Numero_Parte'], $row['Storage_Bin'], $row['Storage_Type']);
+        $stmt2->execute();
+        $existe = $stmt2->get_result()->fetch_assoc()['existe'];
+
+        // 3. INSERTAR SI NO EXISTE
+        if($existe == 0) {
+            $stmt3 = $conex->prepare("INSERT INTO `Bitacora_Inventario` 
+                                    (`NumeroParte`, `Fecha`, `StorageBin`, `StorageType`, `Area`) 
+                                    VALUES (?, ?, ?, ?, '1')");
+            $stmt3->bind_param("ssss", $row['Numero_Parte'], $DateAndTime, $row['Storage_Bin'], $row['Storage_Type']);
+            $stmt3->execute();
+        }
+
+        // 4. DEVOLVER RESPUESTA (CON CÓDIGO 200)
+        http_response_code(200); // <-- ÚNICO CAMBIO REALIZADO
+        echo json_encode(array("data" => $datos_originales));
+
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(array("success" => false, "message" => $e->getMessage()));
+    } finally {
+        // Cerrar statements
+        isset($stmt1) && $stmt1->close();
+        isset($stmt2) && $stmt2->close();
+        isset($stmt3) && $stmt3->close();
+        $con->desconectar();
     }
-
-    $stmt->bind_param("s", $marbete);
-
-    if(!$stmt->execute()) {
-        throw new Exception('Error al ejecutar consulta: ' . $stmt->error);
-    }
-
-    $result = $stmt->get_result();
-
-    if($result->num_rows === 0) {
-        echo json_encode([
-            'success' => false,
-            'data' => [],
-            'message' => 'No se encontró el marbete especificado'
-        ]);
-        exit;
-    }
-
-    $datos = $result->fetch_all(MYSQLI_ASSOC);
-    $primerRegistro = $datos[0];
-
-    // 2. OPERACIÓN SECUNDARIA - Registrar en bitácora si no existe
-    $fechaActual = date('Y-m-d H:i:s');
-    $stmtBitacora = $conex->prepare("INSERT INTO `Bitacora_Inventario` 
-                                   (`NumeroParte`, `Fecha`, `StorageBin`, `StorageType`, `Area`)
-                                   SELECT ?, ?, ?, ?, '1'
-                                   FROM DUAL
-                                   WHERE NOT EXISTS (
-                                       SELECT 1 FROM `Bitacora_Inventario` 
-                                       WHERE `NumeroParte` = ? 
-                                       AND `StorageBin` = ? 
-                                       AND `StorageType` = ?
-                                   )");
-
-    if($stmtBitacora) {
-        $stmtBitacora->bind_param("ssssss",
-            $primerRegistro['Numero_Parte'],
-            $fechaActual,
-            $primerRegistro['Storage_Bin'],
-            $primerRegistro['Storage_Type'],
-            $primerRegistro['Numero_Parte'],
-            $primerRegistro['Storage_Bin'],
-            $primerRegistro['Storage_Type']
-        );
-        $stmtBitacora->execute();
-    }
-
-    // 3. RESPUESTA EXITOSA
-    echo json_encode([
-        'success' => true,
-        'data' => $datos
-    ]);
-
-} catch (Exception $e) {
-    // Registrar error en logs
-    error_log('Error en consultaMarbete.php: ' . $e->getMessage());
-
-    // Respuesta de error
-    echo json_encode([
-        'success' => false,
-        'message' => 'Ocurrió un error al procesar la solicitud'
-    ]);
-
-} finally {
-    // Liberar recursos
-    isset($stmt) && $stmt->close();
-    isset($stmtBitacora) && $stmtBitacora->close();
-    isset($con) && $con->desconectar();
 }
 ?>
