@@ -10,58 +10,62 @@ if(empty($marbete)) {
 
 ContadorApu($marbete);
 
-function ContadorApu($marbete)
-{
+function ContadorApu($marbete) {
     $con = new LocalConector();
     $conex = $con->conectar();
 
-    $Object = new DateTime();
-    $Object->setTimezone(new DateTimeZone('America/Denver'));
-    $DateAndTime = $Object->format("Y/m/d h:i:s");
-
     try {
-        // 1. CONSULTA DATOS ORIGINALES (Storage_Unit)
+        // 1. CONSULTA DATOS ORIGINALES
         $stmt1 = $conex->prepare("SELECT `Id_StorageUnit`, `Numero_Parte`, `Cantidad`, `Storage_Bin`, `Storage_Type`, `Estatus`, `FolioMarbete`, `Conteo` 
-                                 FROM `Storage_Unit` 
-                                 WHERE `Id_StorageUnit` = ?");
-        $stmt1->bind_param("s", $marbete);
-        $stmt1->execute();
-        $result1 = $stmt1->get_result();
+                                FROM `Storage_Unit` 
+                                WHERE `Id_StorageUnit` = ?");
+        if(!$stmt1) throw new Exception("Error al preparar consulta: ".$conex->error);
 
-        if($result1->num_rows === 0) {
-            throw new Exception("No se encontró el marbete especificado");
-        }
+        $stmt1->bind_param("s", $marbete);
+        if(!$stmt1->execute()) throw new Exception("Error al ejecutar consulta: ".$stmt1->error);
+
+        $result1 = $stmt1->get_result();
+        if($result1->num_rows === 0) throw new Exception("No se encontró el marbete especificado");
 
         $datos_originales = $result1->fetch_all(MYSQLI_ASSOC);
-
-        // 2. VERIFICAR EN BITÁCORA (solo verificación, sin devolver datos)
         $row = $datos_originales[0];
-        $stmt2 = $conex->prepare("SELECT COUNT(*) as existe 
-                                FROM `Bitacora_Inventario` 
-                                WHERE `NumeroParte` = ? 
-                                AND `StorageBin` = ? 
-                                AND `StorageType` = ?");
+
+        // 2. VERIFICAR E INSERTAR EN BITÁCORA
+        $stmt2 = $conex->prepare("SELECT COUNT(*) as existe FROM `Bitacora_Inventario` 
+                                WHERE `NumeroParte` = ? AND `StorageBin` = ? AND `StorageType` = ?");
         $stmt2->bind_param("sss", $row['Numero_Parte'], $row['Storage_Bin'], $row['Storage_Type']);
         $stmt2->execute();
         $existe = $stmt2->get_result()->fetch_assoc()['existe'];
 
-        // 3. INSERTAR SI NO EXISTE (operación silenciosa)
         if($existe == 0) {
+            $fecha = date("Y-m-d H:i:s");
             $stmt3 = $conex->prepare("INSERT INTO `Bitacora_Inventario` 
-                                    (`NumeroParte`, `Fecha`, `StorageBin`, `StorageType`, `Area`) 
-                                    VALUES (?, ?, ?, ?, '1')");
-            $stmt3->bind_param("ssss", $row['Numero_Parte'],$DateAndTime, $row['Storage_Bin'], $row['Storage_Type']);
-            $stmt3->execute();
+                                     (`NumeroParte`, `Fecha`, `StorageBin`, `StorageType`, `Area`) 
+                                     VALUES (?, ?, ?, ?, '1')");
+            $stmt3->bind_param("ssss", $row['Numero_Parte'], $fecha, $row['Storage_Bin'], $row['Storage_Type']);
+            if(!$stmt3->execute()) {
+                error_log("Error al insertar en bitácora: ".$stmt3->error);
+                // NO lanzamos excepción para no interrumpir el flujo
+            }
         }
 
-        // 4. DEVOLVER SOLO LOS DATOS ORIGINALES (como en tu primer ejemplo)
-        echo json_encode(array("data" => $datos_originales));
+        // 3. DEVOLVER RESPUESTA
+        header('Content-Type: application/json');
+        echo json_encode(array(
+            "success" => true,
+            "data" => $datos_originales
+        ));
 
     } catch (Exception $e) {
         http_response_code(500);
-        echo json_encode(array("success" => false, "message" => $e->getMessage()));
+        header('Content-Type: application/json');
+        echo json_encode(array(
+            "success" => false,
+            "message" => $e->getMessage(),
+            "error_code" => $conex->errno ?? null
+        ));
     } finally {
-        // Cerrar statements
+        // Liberar recursos
         isset($stmt1) && $stmt1->close();
         isset($stmt2) && $stmt2->close();
         isset($stmt3) && $stmt3->close();
