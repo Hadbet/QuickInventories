@@ -67,44 +67,38 @@ async function manejarArchivo(file) {
 async function actualizarContenidoArchivo(file, dataFromBackend) {
     const reader = new FileReader();
 
-    reader.onload = async function (event) {
+    reader.onload = function (event) {
         const originalContent = event.target.result;
-        const originalLines = originalContent.split(/\r?\n/);
-        const noMatchData = [];
+        const originalLines = originalContent.split(/\r?\n/); // Divide el archivo en líneas
+
         const updatedLines = originalLines.map((line) => {
+            // Divide la línea en partes basándose en espacios/tabulaciones
             const parts = line.trim().split(/\s+/);
 
             if (parts.length >= 6) {
-                const storBin = parts[1];
-                const materialNo = parts[5];
+                const storBin = parts[1]; // `storBin` es el segundo elemento
+                const materialNo = parts[5]; // `materialNo` es el sexto elemento
 
+                // Buscar coincidencia en dataFromBackend
                 const matchingData = dataFromBackend.find(
                     (item) => item.storBin === storBin && item.materialNo === materialNo
                 );
 
                 if (matchingData) {
                     return line.replace("______________", matchingData.conteoFinal);
-                } else {
-                    noMatchData.push({ storBin, materialNo });
-                    return line.replace("______________",'0');
                 }
             }
 
-            return line;
+            return line; // Mantener la línea sin cambios si no hay coincidencia
         });
 
-
-
-        const finalContent = updatedLines.join("\n");
+        const finalContent = updatedLines.join("\n"); // Unir las líneas actualizadas
         const blob = new Blob([finalContent], { type: "text/plain" });
 
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         link.download = `actualizado_${file.name}`;
         link.click();
-
-        dataFromBackend = await enviarDatosAlBackendAux(noMatchData);
-        descargarDataFromBackendPro(dataFromBackend);
     };
 
     reader.readAsText(file);
@@ -114,93 +108,29 @@ async function enviarDatosAlBackend(data) {
     try {
         const response = await fetch('daoAdmin/daoActualizar-txt.php', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', },
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify(data),
         });
-        return await response.json();
+        return await response.json(); // Devolvemos los datos procesados por el backend
     } catch (error) {
         console.error('Error enviando datos al backend:', error);
         return [];
     }
 }
-
-async function enviarDatosAlBackendAux(data) {
-    try {
-        const response = await fetch('daoAdmin/daoActualizar-txtAux.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', },
-            body: JSON.stringify(data),
-        });
-        return await response.json();
-    } catch (error) {
-        console.error('Error enviando datos al backend:', error);
-        return [];
-    }
-}
-function descargarDataFromBackendPro(dataFromBackend) {
-    var wb = XLSX.utils.book_new();
-    wb.Props = {
-        Title: "SheetJS",
-        Subject: "Numeros de parte faltantes",
-        Author: "Hadbetsito",
-        CreatedDate: new Date()
-    };
-    wb.SheetNames.push("Test Sheet");
-    var ws_data = [['InventoryItem', 'Record', 'Bin', 'Bin/n', 'Contador', 'Numero Parte', 'Plant','Cantidad','Type']]; // Encabezados de las columnas
-
-    var storBinCounts = {}; // Para llevar un registro de los 'StorBin' que ya hemos visto
-
-    for (var i = 0; i < dataFromBackend.length; i++) {
-        var inventoryItem = dataFromBackend[i].inventoryItem;
-        var storage_Bin = dataFromBackend[i].storageBin;
-        var invRecount = dataFromBackend[i].invRecount;
-        var numeroParte = dataFromBackend[i].material;
-        var cantidad = dataFromBackend[i].conteoFinal;
-        var plan = dataFromBackend[i].plan;
-        var storage_Type = dataFromBackend[i].storageType;
-
-        // Si 'numeroParte' está vacío, saltar esta iteración
-        if (!numeroParte) {
-            continue;
-        }
-
-        // Si 'StorBin' no comienza con 'P', añadir un contador al final
-        var storage_Bin_Modified = storage_Bin;
-        if (!storage_Bin.startsWith('P')) {
-            storage_Bin_Modified = storage_Bin + '/' + (storBinCounts[storage_Bin] || 1);
-            storBinCounts[storage_Bin] = (storBinCounts[storage_Bin] || 0) + 1;
-        }
-
-        ws_data.push([inventoryItem, invRecount, storage_Bin, storage_Bin+"/"+storBinCounts[storage_Bin], storBinCounts[storage_Bin], numeroParte, plan, cantidad, storage_Type]);
-    }
-
-    var ws = XLSX.utils.aoa_to_sheet(ws_data);
-    wb.Sheets["Test Sheet"] = ws;
-    var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
-
-    function s2ab(s) {
-        var buf = new ArrayBuffer(s.length);
-        var view = new Uint8Array(buf);
-        for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
-        return buf;
-    }
-
-    saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'Numeros de parte faltantes.xlsx');
-}
-
 
 /**********************************************************************************************************************/
 /*****************************************************TABLA STORAGE_UNIT***********************************************/
 /**********************************************************************************************************************/
-
-var nombreArchivoStorage="";
 document.getElementById('btnTxtStorage').addEventListener('click', () => {
     document.getElementById('fileInputTxtS').click();
 });
+
 document.getElementById('fileInputTxtS').addEventListener('change', async (event) => {
-    const files = Array.from(event.target.files);
-    console.log("Archivos seleccionados:", files);
-    const allNoMatchData = [];
+    const files = Array.from(event.target.files); // Todos los archivos seleccionados
+    console.log("Archivos seleccionados:", files); // Verificar los archivos
+
     for (const file of files) {
         console.log("Procesando archivo:", file.name);
 
@@ -210,12 +140,7 @@ document.getElementById('fileInputTxtS').addEventListener('change', async (event
                 const dataFromBackend = await enviarDatosAlBackendStorage(dataToBackend);
 
                 if (dataFromBackend.length > 0) {
-                    const noMatchData = await actualizarArchivoStorage(file, dataFromBackend);
-                    if (Array.isArray(noMatchData)) {
-                        allNoMatchData.push(...noMatchData);
-                    } else {
-                        console.error(`noMatchData no es un array:`, noMatchData);
-                    }
+                    actualizarArchivoStorage(file, dataFromBackend);
                 } else {
                     console.error(`No se recibieron datos válidos del backend para ${file.name}.`);
                 }
@@ -226,11 +151,9 @@ document.getElementById('fileInputTxtS').addEventListener('change', async (event
             console.error(`No se seleccionó ningún archivo.`);
         }
     }
-
-    if (allNoMatchData.length > 0) {
-        await handleNoMatchData(allNoMatchData,nombreArchivoStorage);
-    }
 });
+
+
 
 async function manejarArchivoStorage(file) {
     const reader = new FileReader();
@@ -238,19 +161,29 @@ async function manejarArchivoStorage(file) {
     return new Promise((resolve, reject) => {
         reader.onload = async (event) => {
             const contenido = event.target.result;
+            // Dividir las líneas del archivo
             const lineas = contenido.split(/\r?\n/);
 
-            const datos = lineas
+            //console.log("Contenido original del archivo:");
+            //console.log(contenido);
+
+            // Filtrar las líneas que contienen datos válidos
+            const datos= lineas
                 .map((linea) => linea.trim())
-                .filter((linea) => /^[0-9]+\s+\w+/.test(linea))
+                .filter((linea) => /^[0-9]+\s+\w+/.test(linea)) // Filtrar líneas válidas (empiezan con un número seguido de texto)
                 .map((linea) => {
+                    // Separar los datos de cada línea
                     const partes = linea.split(/\s+/);
-                    return partes.length >= 2
-                        ? { storBin: partes[1], storUnit: partes[6] }
+
+                    return partes.length >= 7
+                        ? { storUnit: partes[6] }
                         : null;
                 })
-                .filter(Boolean);
+                .filter(Boolean); // Eliminar entradas nulas
 
+            //console.log("Datos procesados desde el archivo:", datos);  // Verifica los datos procesados
+
+            // Resolvemos la promesa con los datos procesados
             resolve(datos);
         };
 
@@ -266,12 +199,15 @@ async function enviarDatosAlBackendStorage(data) {
     try {
         const response = await fetch('daoAdmin/daoActualizarStorage-txt.php', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', },
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify(data),
         });
 
         const jsonResponse = await response.json();
-        return jsonResponse;
+        //console.log("Respuesta del backend:", jsonResponse);  // Verifica la respuesta del backend
+        return jsonResponse; // Devolvemos los datos procesados por el backend
     } catch (error) {
         console.error('Error enviando datos al backend:', error);
         return [];
@@ -279,123 +215,57 @@ async function enviarDatosAlBackendStorage(data) {
 }
 
 async function actualizarArchivoStorage(file, dataFromBackend) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        const noMatchData = [];
+    const reader = new FileReader();
 
-        reader.onload = async function (event) {
-            const originalContent = event.target.result;
-            const originalLines = originalContent.split(/\r?\n/);
+    reader.onload = function (event) {
+        const originalContent = event.target.result;
+        const originalLines = originalContent.split(/\r?\n/); // Divide el archivo en líneas
 
-            const updatedLines = originalLines.map((line) => {
-                const parts = line.trim().split(/\s+/);
+        //console.log("Contenido original del archivo:");
+        //console.log(originalContent);
 
-                if (parts.length >= 8) {
-                    const storBin = parts[1].trim();
-                    const storUnit = parts[6].trim();
+        const updatedLines = originalLines.map((line) => {
+            // Divide la línea en partes basándose en espacios/tabulaciones
+            const parts = line.trim().split(/\s+/); // Separar por espacios múltiples
 
-                    const matchingData = dataFromBackend.find(
-                        (item) => item.storBin === storBin && item.storUnit === storUnit
-                    );
+            if (parts.length >= 8) { // Verificar que haya suficientes columnas
+                const storageUnit = parts[6].trim(); // Obtener la columna Storage Unit
 
-                    if (matchingData) {
-                        return line.replace(/____________/, matchingData.cantidad);
-                    } else {
-                        noMatchData.push({ storUnit });
-                        return line.replace(/____________/, '0');
-                    }
+                //console.log(`Procesando línea: ${line}`);
+                //console.log(`Extracted storageUnit: ${storageUnit}`);
+
+                // Buscar coincidencia en dataFromBackend
+                const matchingData = dataFromBackend.find(
+                    (item) => item.storageUnit === storageUnit
+                );
+
+                if (matchingData) {
+                    //console.log(`Coincidencia encontrada para storageUnit: ${storageUnit}`);
+                    //console.log(`Reemplazando ______________ con: ${matchingData.cantidad}`);
+                    // Reemplazar el valor en la columna "Qty & UoM"
+                    return line.replace(/____________/, matchingData.cantidad);
+                }else {
+                    //console.log(`No se encontró coincidencia para storageUnit: ${storageUnit}`);
                 }
+            }else {
+                //console.log("Formato de línea inesperado:", line);
+            }
 
-                return line;
-            });
-
-            const finalContent = updatedLines.join("\n");
-            const blob = new Blob([finalContent], { type: "text/plain" });
-
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `actualizado_${file.name}`;
-            link.click();
-            nombreArchivoStorage=`${file.name}`;
-            resolve(noMatchData);
-        };
-
-        reader.onerror = (error) => {
-            console.error("Error al leer el archivo:", error);
-            reject(error);
-        };
-
-        reader.readAsText(file);
-    });
-}
-
-async function handleNoMatchData(noMatchData,nombreArchivoStorage) {
-    const dataFromBackendAux = await enviarDatosAlBackendStorageAux(noMatchData);
-    descargarDataFromBackend(dataFromBackendAux,nombreArchivoStorage);
-}
-
-async function enviarDatosAlBackendStorageAux(data) {
-    try {
-        const response = await fetch('daoAdmin/daoActualizarStorage-txtAux.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', },
-            body: JSON.stringify({ storageUnits: data }),
+            return line; // Mantener la línea sin cambios si no hay coincidencia
         });
 
-        const jsonResponse = await response.json();
-        return jsonResponse;
-    } catch (error) {
-        console.error('Error enviando datos al backend:', error);
-        return [];
-    }
-}
+        const finalContent = updatedLines.join("\n"); // Unir las líneas actualizadas
+        const blob = new Blob([finalContent], { type: "text/plain" });
 
-function descargarDataFromBackend(dataFromBackend,nombreArchivoStorage) {
-    var wb = XLSX.utils.book_new();
-    wb.Props = {
-        Title: "SheetJS",
-        Subject: nombreArchivoStorage,
-        Author: "Hadbetsito",
-        CreatedDate: new Date()
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `actualizado_${file.name}`;
+        link.click();
     };
-    wb.SheetNames.push("Test Sheet");
-    var ws_data = [['InventoryItem', 'Page', 'Bin', 'Bin/n', 'Contador', 'Numero Parte', 'Plant','Cantidad','Sun','Type']];
 
-    var storBinCounts = {};
+    reader.onerror = (error) => {
+        console.error("Error al leer el archivo:", error);
+    };
 
-    for (var i = 0; i < dataFromBackend.length; i++) {
-        var storageUnit = dataFromBackend[i].storageUnit;
-        var inventoryItem = dataFromBackend[i].inventoryItem;
-        var storage_Bin = dataFromBackend[i].storage_Bin;
-        var invRecount = dataFromBackend[i].inventoryPage;
-        var numeroParte = dataFromBackend[i].numero_Parte;
-        var cantidad = dataFromBackend[i].cantidad;
-        var plan = dataFromBackend[i].plan;
-        var storage_Type = dataFromBackend[i].storage_Type;
-
-        if (!numeroParte) {
-            continue;
-        }
-
-        var storage_Bin_Modified = storage_Bin;
-        if (!storage_Bin.startsWith('P')) {
-            storage_Bin_Modified = storage_Bin + '/' + (storBinCounts[storage_Bin] || 1);
-            storBinCounts[storage_Bin] = (storBinCounts[storage_Bin] || 0) + 1;
-        }
-
-        ws_data.push([inventoryItem, invRecount, storage_Bin, storage_Bin+"/"+storBinCounts[storage_Bin], storBinCounts[storage_Bin], numeroParte, plan, cantidad,storageUnit, storage_Type]);
-    }
-
-    var ws = XLSX.utils.aoa_to_sheet(ws_data);
-    wb.Sheets["Test Sheet"] = ws;
-    var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
-
-    function s2ab(s) {
-        var buf = new ArrayBuffer(s.length);
-        var view = new Uint8Array(buf);
-        for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
-        return buf;
-    }
-
-    saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), nombreArchivoStorage+'.xlsx');
+    reader.readAsText(file);
 }

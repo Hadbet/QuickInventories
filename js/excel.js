@@ -1,3 +1,6 @@
+/**********************************************************************************************************************/
+/********************************************EXCEL QTY*****************************************************************/
+/**********************************************************************************************************************/
 document.getElementById('btnExcelExcelQty').addEventListener('click', () => {
     document.getElementById('fileInputExcelQty').click();
 });
@@ -9,16 +12,12 @@ document.getElementById('fileInputExcelQty').addEventListener('change', async (e
     if (file) {
         try {
             // Paso 1: Procesar el archivo Excel
-            const dataToBackend = await manejarExcelCompleto(file);
+            const dataToBackend = await manejarExcelQty(file);
 
-            // Paso 2: Enviar los datos al PHP
-            const responseFromPHP = await enviarDatosAPHP(dataToBackend);
-            console.log("Respuesta del PHP:", responseFromPHP);
-
-            // Paso 3: Consultar el backend con los datos extraídos
+            // Paso 2: Consultar el backend con los datos extraídos
             const dataFromBackend = await buscarValoresEnBaseDeDatos(dataToBackend);
 
-            // Paso 4: Actualizar el archivo Excel solo si hay datos del backend
+            // Paso 3: Actualizar el archivo Excel solo si hay datos del backend
             if (dataFromBackend.length > 0) {
                 await actualizarExcelQty(file, dataFromBackend);
                 console.log("Archivo Excel actualizado y descargado.");
@@ -33,75 +32,6 @@ document.getElementById('fileInputExcelQty').addEventListener('change', async (e
     }
 });
 
-async function manejarExcelCompleto(file) {
-    const workbook = new ExcelJS.Workbook();
-    const data = await file.arrayBuffer();
-    await workbook.xlsx.load(data);
-
-    const worksheet = workbook.getWorksheet(1); // Primera hoja
-    const ExcelQtyData = [];
-
-    worksheet.eachRow((row, rowNumber) => {
-        if (rowNumber > 1) { // Omitir encabezados
-            const registro = {
-                Client: row.getCell(1).value || "",
-                WarehouseNo: row.getCell(2).value || "",
-                InventoryItem: row.getCell(3).value || "",
-                Quant: row.getCell(5).value || "",
-                InvRecount: row.getCell(6).value || "",
-                InventStatus: row.getCell(7).value || "",
-                InventoryPage: row.getCell(9).value || "",
-                StorageType: row.getCell(10).value || "",
-                StorageBin: row.getCell(11).value || "",
-                BinPosition: row.getCell(12).value || "",
-                Material: row.getCell(13).value || "",
-                Plant: row.getCell(14).value || "",
-                Batch: row.getCell(15).value || "",
-                StorUnitType: row.getCell(34).value || "",
-                TotalStock: row.getCell(28).value || "",
-                Invent: row.getCell(30).value || "",
-                TransferOrder: row.getCell(17).value || "",
-                TransferItem: row.getCell(32).value || "",
-                StorageLocation: row.getCell(33).value || "",
-                NameCounter: row.getCell(37).value || ""
-            };
-            ExcelQtyData.push(registro);
-        }
-    });
-
-    return ExcelQtyData;
-}
-
-async function enviarDatosAPHP(datos) {
-    try {
-        const response = await fetch('daoAdmin/daoInsertarInv.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ bitacoraDatos: datos }),
-        });
-
-        if (!response.ok) {
-            throw new Error(`Error al consultar el backend: ${response.statusText}`);
-        }
-
-        // El backend devuelve un array con las columnas adicionales (M y N)
-        const resultados = await response.json();
-
-        // Verificar si hubo un error en el backend
-        if (resultados.status === 'error') {
-            console.error("Error en el backend:", resultados.message);
-            // Aquí puedes manejar el error como prefieras, por ejemplo, mostrando un mensaje al usuario
-        }
-
-        return resultados;
-    } catch (error) {
-        console.error("Error en la consulta al backend:", error);
-        return [];
-    }
-}
-
 async function manejarExcelQty(file) {
     const workbook = new ExcelJS.Workbook();
     const data = await file.arrayBuffer();
@@ -113,9 +43,9 @@ async function manejarExcelQty(file) {
     worksheet.eachRow((row, rowNumber) => {
         if (rowNumber > 1) { // Omitir encabezados
             const registro = {
-                storageBin: row.getCell(11).value || "", // Columna G
-                noParte: row.getCell(13).value || "", // Columna I
-                storageUnit: row.getCell(16).value || "" // Columna L
+                storageBin: row.getCell(7).value || "", // Columna G
+                noParte: row.getCell(9).value || "", // Columna I
+                storageUnit: row.getCell(12).value || "" // Columna L
             };
             ExcelQtyData.push(registro);
         }
@@ -146,7 +76,6 @@ async function buscarValoresEnBaseDeDatos(datos) {
         return [];
     }
 }
-
 async function actualizarExcelQty(file, dataFromBackend) {
     const workbook = new ExcelJS.Workbook();
     const data = await file.arrayBuffer();  // Leemos el archivo
@@ -159,9 +88,9 @@ async function actualizarExcelQty(file, dataFromBackend) {
     // Recorremos las filas del Excel, excluyendo el encabezado
     worksheet.eachRow((row, rowNumber) => {
         if (rowNumber > 1) { // Excluir la primera fila (encabezados)
-            const storageBin = row.getCell(11).value?.toString().trim(); // Columna G es storageBin
-            const materialNo = row.getCell(13).value?.toString().trim();  // Columna I es materialNo
-            const storageUnit = row.getCell(34).value?.toString().trim();  // Columna L es storageUnit
+            const storageBin = row.getCell(7).value?.toString().trim(); // Columna G es storageBin
+            const materialNo = row.getCell(9).value?.toString().trim();  // Columna I es materialNo
+            const storageUnit = row.getCell(12).value?.toString().trim();  // Columna L es storageUnit
 
             console.log(`Procesando fila ${rowNumber}: storageBin = ${storageBin}, materialNo = ${materialNo}, storageUnit = ${storageUnit}`);
 
@@ -170,7 +99,7 @@ async function actualizarExcelQty(file, dataFromBackend) {
             if (storageUnit && storageUnit !== '') {
                 console.log(`Buscando por storageUnit: ${storageUnit}`);
                 matchingData = dataFromBackend.find(
-                    (item) => item.storageUnit === storageUnit && item.storageBin === storageBin
+                    (item) => item.storageUnit === storageUnit
                 );
             } else {
                 console.log(`Buscando por storageBin: ${storageBin}, materialNo: ${materialNo}`);
@@ -185,11 +114,10 @@ async function actualizarExcelQty(file, dataFromBackend) {
                 console.log(`Actualizando columnas L y M con: storageUnit = ${matchingData.storageUnit}, cantidad = ${matchingData.cantidad}`);
 
                 // Si hay coincidencia, actualizamos las celdas correspondientes
-                row.getCell(18).value = matchingData.cantidad;     // Columna M - cantidad
-                row.getCell(17).value = matchingData.unit;  // Columna N - unit
+                row.getCell(13).value = matchingData.cantidad;     // Columna M - cantidad
+                row.getCell(14).value = matchingData.unit;  // Columna N - unit
             } else {
-                row.getCell(18).value = '0';
-                //console.log(`No se encontró coincidencia para storageBin: ${storageBin}, materialNo: ${materialNo}, storageUnit: ${storageUnit}`);
+                console.log(`No se encontró coincidencia para storageBin: ${storageBin}, materialNo: ${materialNo}, storageUnit: ${storageUnit}`);
             }
         }
     });
@@ -204,74 +132,88 @@ async function actualizarExcelQty(file, dataFromBackend) {
     a.click();
 
     console.log("Descarga del archivo iniciada.");
-    await numerosFaltantes();
 }
 
-async function numerosFaltantes() {
-    $.getJSON('https://grammermx.com/Logistica/Inventario2024/dao/consultaInv.php', function (data) {
-        if (data && data.data && data.data.length > 0) {
-            Swal.fire({
-                title: "Se encontraron numeros de parte que no estan en el archivo pero si en la base de datos",
-                text: "Se te descargara un archivo",
-                icon: "info"
-            });
-            var wb = XLSX.utils.book_new();
-            wb.Props = {
-                Title: "SheetJS",
-                Subject: "Numeros de parte faltantes",
-                Author: "Hadbetsito",
-                CreatedDate: new Date(2017,12,19)
+
+
+
+
+/**********************************************************************************************************************/
+/********************************************EXCEL INVENTARIO - STORAGE************************************************/
+/**********************************************************************************************************************/
+
+document.getElementById('btnExcelInvenStor').addEventListener('click', () => {
+    document.getElementById('fileInputInvenStor').click();
+});
+
+document.getElementById('fileInputInvenStor').addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        insertarExcelInvenStor(file);
+    }
+});
+
+async function insertarExcelInvenStor(file) {
+    try {
+        // Leer el archivo Excel
+        const data = await file.arrayBuffer();
+        const workbook = XLSX.read(data, { type: 'array' });
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+        // Obtener el rango del Excel
+        const range = XLSX.utils.decode_range(worksheet['!ref']);
+
+        // Crear un array para almacenar los datos
+        const invenStorData = [];
+
+        // Recorrer fila por fila, asegurándose de incluir todas las columnas (A, B, C, D, E, F, G)
+        for (let row = range.s.r + 1; row <= range.e.r; row++) {
+            const registro = {
+                STLocation: worksheet[`A${row + 1}`]?.v || "", // Columna A
+                STBin: worksheet[`B${row + 1}`]?.v || "", // Columna B
+                STType: worksheet[`C${row + 1}`]?.v || "", // Columna C
+                GrammerNo: worksheet[`D${row + 1}`]?.v || "", // Columna D
+                Cantidad: worksheet[`E${row + 1}`]?.v || "", // Columna E
+                AreaCVe: worksheet[`F${row + 1}`]?.v || "",// Columna F
+                Id_StorageUnit: worksheet[`G${row + 1}`]?.v || "" // Columna G
             };
-            wb.SheetNames.push("Test Sheet");
-            var storageBinCount = {};
-            var ws_data = [];
-
-            for (var i = 0; i < data.data.length; i++) {
-                var InventoryItem = data.data[i].InventoryItem;
-                var StorageBin = data.data[i].StorageBin;
-                var StorageBinCompleto = data.data[i].StorageBin;
-                var NumeroParte = data.data[i].NumeroParte;
-                var Plant = data.data[i].Plant;
-                var Cantidad = data.data[i].Cantidad;
-                var StorageUnit = data.data[i].StorageUnit;
-                var StorageType = data.data[i].StorageType;
-                var InvRecount = data.data[i].InvRecount; // Assuming you have InvRecount in your data
-
-                // Add a consecutive number to StorageBin if it's a duplicate and starts with 'R'
-                var StorageBinNumber = '';
-                if (StorageBin.startsWith('R')) {
-                    if (storageBinCount[StorageBin]) {
-                        storageBinCount[StorageBin]++;
-                    } else {
-                        storageBinCount[StorageBin] = 1;
-                    }
-                    StorageBinNumber = storageBinCount[StorageBin];
-                    StorageBin = StorageBin + '/' + StorageBinNumber;
-                }
-
-                ws_data.push([InventoryItem, InvRecount, StorageBin,StorageBinNumber, StorageBinCompleto, NumeroParte, Plant, Cantidad, StorageUnit, StorageType]);
-            }
-
-            var ws = XLSX.utils.aoa_to_sheet(ws_data);
-            wb.Sheets["Test Sheet"] = ws;
-            var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
-
-            function s2ab(s) {
-                var buf = new ArrayBuffer(s.length);
-                var view = new Uint8Array(buf);
-                for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
-                return buf;
-            }
-
-            saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'Numeros de parte faltantes.xlsx');
+            invenStorData.push(registro);
         }
-    });
+
+        // Enviar los datos al backend
+        const response = await fetch('daoAdmin/daoInsertarInvenStor.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ invenStorDatos: invenStorData })
+        });
+
+        // Obtener la respuesta del backend
+        const result = await response.json();
+
+        if (result.status === "success") {
+            Swal.fire({
+                icon: 'success',
+                title: 'Actualización exitosa',
+                text: result.message
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    cargarDatosInventario();
+                    cargarDatosStorage();
+                }
+            });
+        } else {
+            throw new Error(result.message + ' Detalles: ' + result.detalles);
+        }
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'Ocurrió un error al procesar el archivo. Recargue la página e intente nuevamente.'
+        });
+    }
 }
-
-
-
-
-
 
 /**********************************************************************************************************************/
 /********************************************************TOOLTIPS******************************************************/
@@ -391,7 +333,7 @@ async function insertarExcelBitacora(file) {
         const bitacoraData = [];
 
         // Recorrer fila por fila, asegurándose de incluir todas las columnas (A, B, C, D, E)
-        for (let row = range.s.r; row <= range.e.r; row++) {
+        for (let row = range.s.r + 1; row <= range.e.r; row++) {
             const registro = {
                 NumeroParte: worksheet[`A${row + 1}`]?.v || "", // Columna A
                 FolioMarbete: worksheet[`B${row + 1}`]?.v || "", // Columna B

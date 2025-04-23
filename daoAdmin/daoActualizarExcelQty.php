@@ -23,9 +23,9 @@ if (!$conexion) {
 $updatedData = [];
 
 foreach ($data as $record) {
-    $storageUnit = mysqli_real_escape_string($conexion, $record['StorUnitType']);
-    $storageBin = mysqli_real_escape_string($conexion, $record['StorageBin']);
-    $noParte = mysqli_real_escape_string($conexion, $record['Material']);
+    $storageUnit = mysqli_real_escape_string($conexion, $record['storageUnit']);
+    $storageBin = mysqli_real_escape_string($conexion, $record['storageBin']);
+    $noParte = mysqli_real_escape_string($conexion, $record['noParte']);
 
     // Inicializar datos predeterminados
     $cantidad = '0';
@@ -33,7 +33,7 @@ foreach ($data as $record) {
 
     // Consulta de cantidad
     $consQ = ($storageUnit != null && $storageUnit != "")
-        ? "SELECT Cantidad FROM Storage_Unit WHERE Id_StorageUnit = '$storageUnit'"
+        ? "SELECT Cantidad FROM Storage_Unit WHERE Id_StorageUnit = '$storageUnit' AND Estatus = 1"
         : "SELECT 
                 CASE
                     WHEN (SegundoConteo IS NULL OR SegundoConteo = 0) 
