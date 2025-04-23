@@ -306,8 +306,8 @@ if (strlen($nomina) == 7) {
                 if (data.success && data.data && data.data.length > 0) {
                     var item = data.data[0];
 
-                    numeroParte=item.NumeroParte;
-                    storageBin=item.StorageBin;
+                    numeroParte=item.Numero_Parte;
+                    storageBin=item.Storage_Bin;
 
                     document.getElementById("reader").style.display = 'none';
                     document.getElementById("Ubicacion").innerHTML = "Ubicación: " + item.Storage_Bin;
