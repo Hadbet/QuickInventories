@@ -296,10 +296,7 @@ if (strlen($nomina) == 7) {
 
     function manualMarbete() {
         var marbete = document.getElementById("scanner_input").value;
-
-        // Limpiar el input después de obtener el valor
         limpiarEscan();
-
         $.ajax({
             url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaMarbete.php',
             type: 'GET',
@@ -307,7 +304,10 @@ if (strlen($nomina) == 7) {
             data: { marbete: marbete },
             success: function(data) {
                 if (data.success && data.data && data.data.length > 0) {
-                    var item = data.data[0]; // Tomamos el primer elemento
+                    var item = data.data[0];
+
+                    numeroParte=item.NumeroParte;
+                    storageBin=item.StorageBin;
 
                     document.getElementById("reader").style.display = 'none';
                     document.getElementById("Ubicacion").innerHTML = "Ubicación: " + item.Storage_Bin;
@@ -337,7 +337,6 @@ if (strlen($nomina) == 7) {
     }
 
     function lecturaCorrecta(decodedText, decodedResult) {
-
         $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaMarbete.php?marbete='+decodedText, function (data) {
             if (data && data.data && data.data.length > 0) {
 
@@ -354,11 +353,8 @@ if (strlen($nomina) == 7) {
                     document.getElementById("txtNumeroParteAgregar").value = numeroParte;
                     document.getElementById("pasoDos").style.display = 'block';
                     document.getElementById("pasoUno").style.display = 'none';
-
                     document.getElementById('txtStorageUnit').focus();
-
                     limpiarEscan();
-
                 }
 
             }else{
@@ -391,7 +387,6 @@ if (strlen($nomina) == 7) {
 
     function storageUnitManual() {
         var txtStorageUnitValue = document.getElementById("txtStorageUnit").value;
-
         if (txtStorageUnitValue.length === 10 && parseInt(txtStorageUnitValue) < ultimoSum){
             $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaStorageUnit.php?storageUnit='+document.getElementById("txtStorageUnit").value+'&bin='+storageBin+'&conteo='+auxConteo, function (data) {
                 if (data.Estatus) {
