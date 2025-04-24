@@ -147,20 +147,31 @@
 <script src="lib/sweetalert2.all.min.js"></script>
 
 <script>
-    $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaSun.php?storageBin='+storageBin+'&numeroParte='+numeroParte+'&storageType='+storageType, function(data) {
-        // Limpiar el contenedor completamente
-        tablaContainer.innerHTML = '';
 
-        if (data && data.data && data.data.length > 0) {
-            // Crear elementos de tabla desde cero
-            const table = document.createElement('table');
-            table.className = 'table table-bordered table-hover';
-            table.id = 'tablaResultados';
+    function buscarDatos() {
+        // Obtener los valores de los inputs
+        const numeroParte = document.getElementById('txtNumeroParte').value;
+        const storageBin = document.getElementById('txtStorageBin').value;
+        const storageType = document.getElementById('txtStorageType').value;
 
-            // Crear thead
-            const thead = document.createElement('thead');
-            thead.className = 'thead-light';
-            thead.innerHTML = `
+        // Mostrar loader mientras se carga la información
+        const tablaContainer = document.getElementById('tablaContainer');
+        tablaContainer.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="sr-only">Cargando...</span></div></div>';
+
+        $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaSun.php?storageBin='+storageBin+'&numeroParte='+numeroParte+'&storageType='+storageType, function(data) {
+            // Limpiar el contenedor completamente
+            tablaContainer.innerHTML = '';
+
+            if (data && data.data && data.data.length > 0) {
+                // Crear elementos de tabla desde cero
+                const table = document.createElement('table');
+                table.className = 'table table-bordered table-hover';
+                table.id = 'tablaResultados';
+
+                // Crear thead
+                const thead = document.createElement('thead');
+                thead.className = 'thead-light';
+                thead.innerHTML = `
             <tr>
                 <th>SUN</th>
                 <th>Cantidad</th>
@@ -168,70 +179,71 @@
             </tr>
         `;
 
-            // Crear tbody
-            const tbody = document.createElement('tbody');
+                // Crear tbody
+                const tbody = document.createElement('tbody');
 
-            // Llenar la tabla con los datos
-            for (var i = 0; i < data.data.length; i++) {
-                const item = data.data[i];
-                const row = document.createElement('tr');
+                // Llenar la tabla con los datos
+                for (var i = 0; i < data.data.length; i++) {
+                    const item = data.data[i];
+                    const row = document.createElement('tr');
 
-                // Celda SUN (Id_StorageUnit)
-                const cellSUN = document.createElement('td');
-                cellSUN.textContent = item.Id_StorageUnit || 'N/A';
+                    // Celda SUN (Id_StorageUnit)
+                    const cellSUN = document.createElement('td');
+                    cellSUN.textContent = item.Id_StorageUnit || 'N/A';
 
-                // Celda Cantidad
-                const cellCantidad = document.createElement('td');
-                cellCantidad.textContent = item.Cantidad || '0';
+                    // Celda Cantidad
+                    const cellCantidad = document.createElement('td');
+                    cellCantidad.textContent = item.Cantidad || '0';
 
-                // Celda Estatus con Checkbox
-                const cellEstatus = document.createElement('td');
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.className = 'estatus-checkbox';
-                checkbox.checked = item.Estatus == 1; // true si Estatus es 1
+                    // Celda Estatus con Checkbox
+                    const cellEstatus = document.createElement('td');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'estatus-checkbox';
+                    checkbox.checked = item.Estatus == 1; // true si Estatus es 1
 
-                // Añadir evento para detectar cambios
-                checkbox.addEventListener('change', function() {
-                    const SUN = this.closest('tr').cells[0].textContent;
-                    const nuevoEstado = this.checked;
-                    console.log(`SUN: ${SUN}, Nuevo estado: ${nuevoEstado ? 'Contado' : 'No contado'}`);
+                    // Añadir evento para detectar cambios
+                    checkbox.addEventListener('change', function() {
+                        const SUN = this.closest('tr').cells[0].textContent;
+                        const nuevoEstado = this.checked;
+                        console.log(`SUN: ${SUN}, Nuevo estado: ${nuevoEstado ? 'Contado' : 'No contado'}`);
 
-                    // Aquí puedes agregar tu lógica adicional cuando cambia el estado
-                    // Por ejemplo, hacer una llamada AJAX para actualizar en servidor
-                });
+                        // Aquí puedes agregar tu lógica adicional cuando cambia el estado
+                        // Por ejemplo, hacer una llamada AJAX para actualizar en servidor
+                    });
 
-                cellEstatus.appendChild(checkbox);
+                    cellEstatus.appendChild(checkbox);
 
-                // Añadir celdas a la fila
-                row.appendChild(cellSUN);
-                row.appendChild(cellCantidad);
-                row.appendChild(cellEstatus);
+                    // Añadir celdas a la fila
+                    row.appendChild(cellSUN);
+                    row.appendChild(cellCantidad);
+                    row.appendChild(cellEstatus);
 
-                // Añadir fila al tbody
-                tbody.appendChild(row);
+                    // Añadir fila al tbody
+                    tbody.appendChild(row);
+                }
+
+                // Ensamblar la tabla
+                table.appendChild(thead);
+                table.appendChild(tbody);
+
+                // Crear contenedor responsive y añadir la tabla
+                const tableResponsive = document.createElement('div');
+                tableResponsive.className = 'table-responsive';
+                tableResponsive.appendChild(table);
+
+                // Añadir la tabla al contenedor
+                tablaContainer.appendChild(tableResponsive);
+            } else {
+                // Mostrar mensaje si no hay datos
+                tablaContainer.innerHTML = '<div class="alert alert-warning">No se encontraron resultados</div>';
             }
-
-            // Ensamblar la tabla
-            table.appendChild(thead);
-            table.appendChild(tbody);
-
-            // Crear contenedor responsive y añadir la tabla
-            const tableResponsive = document.createElement('div');
-            tableResponsive.className = 'table-responsive';
-            tableResponsive.appendChild(table);
-
-            // Añadir la tabla al contenedor
-            tablaContainer.appendChild(tableResponsive);
-        } else {
-            // Mostrar mensaje si no hay datos
-            tablaContainer.innerHTML = '<div class="alert alert-warning">No se encontraron resultados</div>';
-        }
-    }).fail(function(jqxhr, textStatus, error) {
-        // Manejar errores de la petición
-        tablaContainer.innerHTML = '<div class="alert alert-danger">Error al cargar los datos: ' + textStatus + '</div>';
-        console.error("Error en la petición: ", textStatus, error);
-    });
+        }).fail(function(jqxhr, textStatus, error) {
+            // Manejar errores de la petición
+            tablaContainer.innerHTML = '<div class="alert alert-danger">Error al cargar los datos: ' + textStatus + '</div>';
+            console.error("Error en la petición: ", textStatus, error);
+        });
+    }
 
     $.ajax({
         url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaAuditor.php', // Reemplaza esto con la URL de tus datos
