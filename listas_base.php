@@ -150,9 +150,9 @@
 
     function buscarDatos() {
         // Obtener los valores de los inputs
-        const numeroParte = document.getElementById('numeroParte').value;
-        const storageBin = document.getElementById('storageBin').value;
-        const storageType = document.getElementById('storageType').value;
+        const numeroParte = document.getElementById('txtNumeroParte').value;
+        const storageBin = document.getElementById('txtStorageBin').value;
+        const storageType = document.getElementById('txtStorageType').value;
 
         // Mostrar loader mientras se carga la información
         const tablaContainer = document.getElementById('tablaContainer');
