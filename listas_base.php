@@ -90,7 +90,7 @@
             var table = $('#dataTable-1').DataTable({
                 data: data.data,
                 columns: [
-                    { data: 'FolioMarbete' },
+                    { data: 'Id_Bitacora' },
                     { data: 'NumeroParte' },
                     { data: 'PrimerConteo' },
                     { data: 'SegundoConteo' },

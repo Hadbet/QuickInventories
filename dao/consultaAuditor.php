@@ -15,7 +15,6 @@ function ContadorApu()
     $datos = mysqli_query($conex, "SELECT 
     `Id_Bitacora`, 
     `NumeroParte`, 
-    `FolioMarbete`, 
     `Fecha`, 
     `Usuario`,
     CASE 
