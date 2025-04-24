@@ -153,7 +153,6 @@
         const numeroParte = document.getElementById('txtNumeroParte').value;
         const storageBin = document.getElementById('txtStorageBin').value;
         const storageType = document.getElementById('txtStorageType').value;
-        const cantidad = document.getElementById('txtCantidad').value;
 
         // Mostrar loader mientras se carga la información
         const tablaContainer = document.getElementById('tablaContainer');
@@ -209,7 +208,7 @@
                         const CANTIDADSUN = this.closest('tr').cells[1].textContent;
                         const nuevoEstado = this.checked;
                         console.log(`SUN: ${SUN}, Nuevo estado: ${nuevoEstado ? 'Contado' : 'No contado'}`);
-                        document.getElementById("txtCantidad").value = parseFloat(cantidad)+parseFloat(CANTIDADSUN);
+                        document.getElementById("txtCantidad").value = parseFloat(document.getElementById("txtCantidad").value)+parseFloat(CANTIDADSUN);
 
                     });
 
