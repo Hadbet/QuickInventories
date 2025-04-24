@@ -147,7 +147,6 @@
 <script src="lib/sweetalert2.all.min.js"></script>
 
 <script>
-
     $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaSun.php?storageBin='+storageBin+'&numeroParte='+numeroParte+'&storageType='+storageType, function(data) {
         // Limpiar el contenedor completamente
         tablaContainer.innerHTML = '';
@@ -233,6 +232,7 @@
         tablaContainer.innerHTML = '<div class="alert alert-danger">Error al cargar los datos: ' + textStatus + '</div>';
         console.error("Error en la petición: ", textStatus, error);
     });
+
     $.ajax({
         url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaAuditor.php', // Reemplaza esto con la URL de tus datos
         dataType: 'json',
