@@ -34,8 +34,6 @@
                                             <th>Folio</th>
                                             <th>Número de Parte</th>
                                             <th>Primer Conteo</th>
-                                            <th>Segundo Conteo</th>
-                                            <th>Tercer Conteo</th>
                                             <th>Comentario</th>
                                             <th>StorageBin</th>
                                             <th>StorageType</th>
@@ -93,8 +91,6 @@
                     { data: 'Id_Bitacora' },
                     { data: 'NumeroParte' },
                     { data: 'PrimerConteo' },
-                    { data: 'SegundoConteo' },
-                    { data: 'TercerConteo' },
                     { data: 'Comentario' },
                     { data: 'StorageBin' },
                     { data: 'StorageType' },
