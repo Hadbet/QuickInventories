@@ -153,6 +153,7 @@
         const numeroParte = document.getElementById('txtNumeroParte').value;
         const storageBin = document.getElementById('txtStorageBin').value;
         const storageType = document.getElementById('txtStorageType').value;
+        const cantidad = document.getElementById('txtCantidad').value;
 
         // Mostrar loader mientras se carga la información
         const tablaContainer = document.getElementById('tablaContainer');
@@ -205,11 +206,11 @@
                     // Añadir evento para detectar cambios
                     checkbox.addEventListener('change', function() {
                         const SUN = this.closest('tr').cells[0].textContent;
+                        const CANTIDADSUN = this.closest('tr').cells[1].textContent;
                         const nuevoEstado = this.checked;
                         console.log(`SUN: ${SUN}, Nuevo estado: ${nuevoEstado ? 'Contado' : 'No contado'}`);
+                        document.getElementById("txtCantidad").value = parseFloat(cantidad)+parseFloat(CANTIDADSUN);
 
-                        // Aquí puedes agregar tu lógica adicional cuando cambia el estado
-                        // Por ejemplo, hacer una llamada AJAX para actualizar en servidor
                     });
 
                     cellEstatus.appendChild(checkbox);
