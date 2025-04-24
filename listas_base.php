@@ -46,8 +46,6 @@
                                             <th>Folio</th>
                                             <th>Número de Parte</th>
                                             <th>Primer Conteo</th>
-                                            <th>Segundo Conteo</th>
-                                            <th>Tercer Conteo</th>
                                             <th>Comentario</th>
                                             <th>StorageBin</th>
                                             <th>StorageType</th>
