@@ -208,7 +208,12 @@
                         const CANTIDADSUN = this.closest('tr').cells[1].textContent;
                         const nuevoEstado = this.checked;
                         console.log(`SUN: ${SUN}, Nuevo estado: ${nuevoEstado ? 'Contado' : 'No contado'}`);
-                        document.getElementById("txtCantidad").value = parseFloat(document.getElementById("txtCantidad").value)+parseFloat(CANTIDADSUN);
+
+                        if (nuevoEstado){
+                            document.getElementById("txtCantidad").value = parseFloat(document.getElementById("txtCantidad").value)+parseFloat(CANTIDADSUN);
+                        }else{
+                            document.getElementById("txtCantidad").value = parseFloat(document.getElementById("txtCantidad").value)-parseFloat(CANTIDADSUN);
+                        }
 
                     });
 
