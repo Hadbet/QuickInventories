@@ -174,7 +174,7 @@
                 thead.className = 'thead-light';
                 thead.innerHTML = `
                 <tr>
-                    <th>Número Parte</th>
+                    <th>SUN</th>
                     <th>Cantidad</th>
                     <th>Estatus</th>
                 </tr>
@@ -190,7 +190,7 @@
 
                     // Celda Número Parte
                     const cellNumeroParte = document.createElement('td');
-                    cellNumeroParte.textContent = item.Numero_Parte || 'N/A';
+                    cellNumeroParte.textContent = item.Id_StorageUnit || 'N/A';
 
                     // Celda Cantidad
                     const cellCantidad = document.createElement('td');
