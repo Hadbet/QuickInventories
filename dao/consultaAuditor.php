@@ -30,10 +30,10 @@ function ContadorApu()
     `Comentario`, 
     `StorageBin`, 
     `StorageType`, 
-    `Area` 
+    `Area`,
+    CONCAT('<button class=\"btn btn-info text-white\" onclick=\"llenarDatos(\'', `Id_Bitacora`, '\', \'', `NumeroParte`, '\', \'', `Comentario`, '\', \'', `PrimerConteo`, '\', \'', `StorageBin`, '\', \'', `StorageType`, '\')\">Modificar</button>') AS `Boton`
 FROM 
-    `Bitacora_Inventario` 
-WHERE 1;");
+    `Bitacora_Inventario` ;");
 
     $resultado = mysqli_fetch_all($datos, MYSQLI_ASSOC);
     echo json_encode(array("data" => $resultado));

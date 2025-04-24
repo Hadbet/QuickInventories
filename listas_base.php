@@ -39,6 +39,7 @@
                                             <th>StorageType</th>
                                             <th>Usuario</th>
                                             <th>Estatus</th>
+                                            <th>Boton</th>
                                         </tr>
                                         </thead>
                                         <tfoot>
@@ -51,6 +52,7 @@
                                             <th>StorageType</th>
                                             <th>Usuario</th>
                                             <th>Estatus</th>
+                                            <th>Boton</th>
                                         </tr>
                                         </tfoot>
                                         <tbody>
@@ -62,6 +64,69 @@
                         </div> <!-- simple table -->
                     </div> <!-- end section -->
                 </div> <!-- .col-12 -->
+
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <button type="button" id="btnEntrar" style="display: none" class="btn mb-2 btn-outline-success" data-toggle="modal" data-target="#verticalModal"> Entrar </button>
+                            <!-- Modal -->
+                            <div class="modal fade" id="verticalModal" tabindex="-1" role="dialog" aria-labelledby="verticalModalTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="verticalModalTitle">Configuracion</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+
+                                            <div class="form-group mb-3">
+                                                <label for="simpleinput">Folio</label>
+                                                <input type="text" id="txtFolio" class="form-control">
+                                            </div>
+
+                                            <div class="form-group mb-3">
+                                                <label for="example-email">Numero Parte</label>
+                                                <input type="text" id="txtNumeroParte" name="example-email" class="form-control" >
+                                            </div>
+
+                                            <div class="form-group mb-3">
+                                                <label for="example-email">Cantidad</label>
+                                                <input type="text" id="txtCantidad" name="example-email" class="form-control" >
+                                            </div>
+
+                                            <div class="form-group mb-3">
+                                                <label for="example-email">StorageBin</label>
+                                                <input type="text" id="txtStorageBin" name="example-email" class="form-control" >
+                                            </div>
+
+                                            <div class="form-group mb-3">
+                                                <label for="example-email">Storage Type</label>
+                                                <input type="text" id="txtStorageType" name="example-email" class="form-control" >
+                                            </div>
+
+                                            <div class="form-group mb-3">
+                                                <label for="example-email">Usuario</label>
+                                                <input type="text" id="txtUsuario" name="example-email" class="form-control" >
+                                            </div>
+
+                                            <div id="tablaContainer">
+                                                <!-- La tabla se generará dinámicamente aquí -->
+                                            </div>
+
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn mb-2 btn-secondary" data-dismiss="modal">Cerrar</button>
+                                            <button type="button" class="btn mb-2 btn-primary">Guardar cambios</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div> <!-- .row -->
         </div> <!-- .container-fluid -->
 
@@ -78,7 +143,99 @@
 <script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.print.min.js"></script>
 
+<!-- JavaScript -->
+<script src="lib/sweetalert2.all.min.js"></script>
+
 <script>
+
+    function buscarDatos() {
+        // Obtener los valores de los inputs
+        const numeroParte = document.getElementById('numeroParte').value;
+        const storageBin = document.getElementById('storageBin').value;
+        const storageType = document.getElementById('storageType').value;
+
+        // Mostrar loader mientras se carga la información
+        const tablaContainer = document.getElementById('tablaContainer');
+        tablaContainer.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="sr-only">Cargando...</span></div></div>';
+
+        // Hacer la llamada AJAX
+        $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaSun.php?storageBin='+storageBin+'&numeroParte='+numeroParte+'&storageType='+storageType, function(data) {
+            // Limpiar el contenedor completamente
+            tablaContainer.innerHTML = '';
+
+            if (data && data.data && data.data.length > 0) {
+                // Crear elementos de tabla desde cero
+                const table = document.createElement('table');
+                table.className = 'table table-bordered table-hover';
+                table.id = 'tablaResultados';
+
+                // Crear thead
+                const thead = document.createElement('thead');
+                thead.className = 'thead-light';
+                thead.innerHTML = `
+                <tr>
+                    <th>Número Parte</th>
+                    <th>Cantidad</th>
+                    <th>Estatus</th>
+                </tr>
+            `;
+
+                // Crear tbody
+                const tbody = document.createElement('tbody');
+
+                // Llenar la tabla con los datos
+                for (var i = 0; i < data.data.length; i++) {
+                    const item = data.data[i];
+                    const row = document.createElement('tr');
+
+                    // Celda Número Parte
+                    const cellNumeroParte = document.createElement('td');
+                    cellNumeroParte.textContent = item.Numero_Parte || 'N/A';
+
+                    // Celda Cantidad
+                    const cellCantidad = document.createElement('td');
+                    cellCantidad.textContent = item.Cantidad || '0';
+
+                    // Celda Estatus
+                    const cellEstatus = document.createElement('td');
+                    const badge = document.createElement('span');
+                    badge.className = item.Estatus == 1
+                        ? 'badge badge-pill badge-success'
+                        : 'badge badge-pill badge-danger';
+                    badge.textContent = item.Estatus == 1 ? 'Contado' : 'No contado';
+                    cellEstatus.appendChild(badge);
+
+                    // Añadir celdas a la fila
+                    row.appendChild(cellNumeroParte);
+                    row.appendChild(cellCantidad);
+                    row.appendChild(cellEstatus);
+
+                    // Añadir fila al tbody
+                    tbody.appendChild(row);
+                }
+
+                // Ensamblar la tabla
+                table.appendChild(thead);
+                table.appendChild(tbody);
+
+                // Crear contenedor responsive y añadir la tabla
+                const tableResponsive = document.createElement('div');
+                tableResponsive.className = 'table-responsive';
+                tableResponsive.appendChild(table);
+
+                // Añadir la tabla al contenedor
+                tablaContainer.appendChild(tableResponsive);
+            } else {
+                // Mostrar mensaje si no hay datos
+                tablaContainer.innerHTML = '<div class="alert alert-warning">No se encontraron resultados</div>';
+            }
+        }).fail(function(jqxhr, textStatus, error) {
+            // Manejar errores de la petición
+            tablaContainer.innerHTML = '<div class="alert alert-danger">Error al cargar los datos: ' + textStatus + '</div>';
+            console.error("Error en la petición: ", textStatus, error);
+        });
+    }
+
     $.ajax({
         url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaAuditor.php', // Reemplaza esto con la URL de tus datos
         dataType: 'json',
@@ -93,7 +250,8 @@
                     { data: 'StorageBin' },
                     { data: 'StorageType' },
                     { data: 'Usuario' },
-                    { data: 'Estatus' }
+                    { data: 'Estatus' },
+                    { data: 'Boton' }
                 ],
                 autoWidth: true,
                 "lengthMenu": [
@@ -139,18 +297,19 @@
             });
         }
     });
+
+    function llenarDatos(idBitacora,numeroParte,comentario,primerConteo,storageBin,storageTipe) {
+        document.getElementById("txtFolio").value = idBitacora;
+        document.getElementById("txtNumeroParte").value = numeroParte;
+        document.getElementById("txtCantidad").value = primerConteo;
+        document.getElementById("txtStorageBin").value = storageBin;
+        document.getElementById("txtStorageType").value = storageTipe;
+        document.getElementById("btnEntrar").click();
+        buscarDatos();
+    }
 </script>
 <script src="js/apps.js"></script>
 <script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag()
-    {
-        dataLayer.push(arguments);
-    }
-    gtag('js', new Date());
-    gtag('config', 'UA-56159088-1');
-
     function verFormato(curso,horario,fecha) {
         var link = "https://grammermx.com/RH/Cursos/pruebaPDF.php?curso="+curso+"&horario="+horario+"&fecha="+fecha;
         window.open(link, '_blank');
