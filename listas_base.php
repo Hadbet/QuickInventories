@@ -221,14 +221,29 @@
                             method: 'POST',
                             body: formData
                         })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    console.log("cambiado");
-                                } else {
-                                    console.log("Hubo un error en la operación");
-                                    console.log("Las unidades de almacenamiento que fallaron son: ", data.message);
+                            .then(response => {
+                                if (!response.ok) { // Verifica si la respuesta HTTP falló (4xx-5xx)
+                                    throw new Error(`Error HTTP: ${response.status}`);
                                 }
+                                return response.json().catch(() => {
+                                    throw new Error("La respuesta no es JSON válido");
+                                });
+                            })
+                            .then(data => {
+                                if (!data) {
+                                    throw new Error("Respuesta vacía del servidor");
+                                }
+
+                                if (data.success) {
+                                    console.log("Configuración guardada exitosamente");
+                                } else {
+                                    console.error("Error en la operación:", data.message || "Sin mensaje de error");
+                                    const failedUnits = data.message || "No se especificaron unidades";
+                                    console.log("Unidades fallidas:", failedUnits);
+                                }
+                            })
+                            .catch(error => {
+                                console.error("Error en la petición fetch:", error.message);
                             });
 
                     cellEstatus.appendChild(checkbox);
