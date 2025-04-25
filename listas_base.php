@@ -202,15 +202,34 @@
                         const SUN = this.closest('tr').cells[0].textContent;
                         const CANTIDADSUN = this.closest('tr').cells[1].textContent;
                         const nuevoEstado = this.checked;
+                        var estatus;
                         console.log(`SUN: ${SUN}, Nuevo estado: ${nuevoEstado ? 'Contado' : 'No contado'}`);
 
                         if (nuevoEstado){
+                            estatus = '1';
                             document.getElementById("txtCantidad").value = parseFloat(document.getElementById("txtCantidad").value)+parseFloat(CANTIDADSUN);
                         }else{
+                            estatus = '0';
                             document.getElementById("txtCantidad").value = parseFloat(document.getElementById("txtCantidad").value)-parseFloat(CANTIDADSUN);
                         }
 
-                    });
+                        var formData = new FormData();
+                        formData.append('estatus', estatus);
+                        formData.append('sun',  SUN);
+
+                        fetch('https://grammermx.com/Logistica/QuickInventories/dao/guardarConfiguracionSun.php', {
+                            method: 'POST',
+                            body: formData
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    console.log("cambiado");
+                                } else {
+                                    console.log("Hubo un error en la operación");
+                                    console.log("Las unidades de almacenamiento que fallaron son: ", data.message);
+                                }
+                            });
 
                     cellEstatus.appendChild(checkbox);
 
