@@ -317,7 +317,7 @@ if (strlen($nomina) == 7) {
 
                             for (var i = 0; i < data.data.length; i++) {
 
-                                if (data.data[i].Estatus===1){
+                                if (data.data[i].Estatus==="1"){
                                     if (addedStorageUnits[data.data[i].Id_StorageUnit]) {
                                         return;
                                     }
