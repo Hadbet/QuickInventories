@@ -107,13 +107,12 @@
                                             </div>
 
                                             <div id="tablaContainer">
-                                                <!-- La tabla se generará dinámicamente aquí -->
                                             </div>
 
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn mb-2 btn-secondary" data-dismiss="modal">Cerrar</button>
-                                            <button type="button" class="btn mb-2 btn-primary">Guardar cambios</button>
+                                            <button type="button" id="btnModalClose" class="btn mb-2 btn-secondary" data-dismiss="modal">Cerrar</button>
+                                            <button type="button" onclick="guardarConfiguracion();" class="btn mb-2 btn-primary">Guardar cambios</button>
                                         </div>
                                     </div>
                                 </div>
@@ -121,10 +120,8 @@
                         </div>
                     </div>
                 </div>
-
             </div> <!-- .row -->
         </div> <!-- .container-fluid -->
-
     </main> <!-- main -->
 </div> <!-- .wrapper -->
 
@@ -342,6 +339,42 @@
         document.getElementById("txtStorageType").value = storageTipe;
         document.getElementById("btnEntrar").click();
         buscarDatos();
+    }
+
+    function guardarConfiguracion() {
+
+        var formData = new FormData();
+        formData.append('estatus', document.getElementById("txtCantidad").value);
+        formData.append('marbete', document.getElementById("txtFolio").value);
+
+        fetch('https://grammermx.com/Logistica/QuickInventories/dao/guardarConfiguracion.php', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data) {
+                    throw new Error("Respuesta vacía del servidor");
+                }
+                if (!data.success) {
+                    console.error("Error en la operación:", data.message);
+                }else{
+                    console.log("Terminado");
+                    document.getElementById("btnModalClose").click();
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error.message);
+                // Revertir cambios si falla
+                this.checked = !nuevoEstado;
+                document.getElementById("txtCantidad").value = parseFloat(document.getElementById("txtCantidad").value) + (nuevoEstado ? -parseFloat(CANTIDADSUN) : parseFloat(CANTIDADSUN));
+            });
+
     }
 </script>
 <script src="js/apps.js"></script>
