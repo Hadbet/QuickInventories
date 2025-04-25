@@ -311,6 +311,44 @@ if (strlen($nomina) == 7) {
                     storageBin=item.Storage_Bin;
                     idMarbete = data.bitacora_id;
 
+
+                    $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaSun.php?storageBin='+item.Storage_Bin+'&numeroParte='+numeroParte+'&storageType='+item.Storage_Type, function (data) {
+                        if (data && data.data && data.data.length > 0) {
+
+                            for (var i = 0; i < data.data.length; i++) {
+
+                                if (addedStorageUnits[data.data[i].Id_StorageUnit]) {
+                                    return;
+                                }
+
+                                addedStorageUnits[data.data[i].Id_StorageUnit] = {
+                                    numeroParte: data.data[i].Numero_Parte,
+                                    cantidad: data.data[i].Cantidad
+                                };
+
+                                cantidad=data.data[i].Cantidad;
+
+                                var table = document.getElementById("data-table");
+                                var row = table.insertRow(-1); // Crea una nueva fila al final de la tabla
+                                var cell1 = row.insertCell(0); // Crea una nueva celda en la fila
+                                var cell2 = row.insertCell(1); // Crea otra nueva celda en la fila
+                                var cell3 = row.insertCell(2);
+                                cell1.innerHTML = data.data[i].Id_StorageUnit;
+                                cell2.innerHTML = data.data[i].Numero_Parte;
+                                cell3.innerHTML = data.data[i].Cantidad;
+
+                                totalContado += parseFloat(data.data[i].Cantidad);
+                                document.getElementById("lblTotalContado").innerText=totalContado;
+
+                            }
+
+                        }else{
+                            console.log("no hay nada")
+                        }
+
+                    });
+
+
                     document.getElementById("reader").style.display = 'none';
                     document.getElementById("Ubicacion").innerHTML = "Ubicación: " + item.Storage_Bin;
                     document.getElementById("txtNumeroParteA").value = item.Numero_Parte;
