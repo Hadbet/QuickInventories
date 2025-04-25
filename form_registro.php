@@ -457,6 +457,7 @@ if (strlen($nomina) == 7) {
                                         text: "Unit : " + data.data[i].Id_StorageUnit,
                                         icon: "error"
                                     });
+                                    document.getElementById("txtStorageUnit").value = "";
                                     return;
                                 }
 
