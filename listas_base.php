@@ -381,6 +381,7 @@
                     { data: 'STType' },
                     { data: 'Cantidad' },
                     { data: 'Boton' }
+                ],
                 autoWidth: true,
                 "lengthMenu": [
                     [16, 32, 64, -1],
