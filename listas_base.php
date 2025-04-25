@@ -74,7 +74,7 @@
                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="verticalModalTitle">Configuracion</h5>
+                                            <h5 class="modal-title" id="verticalModalTitle">Configuración</h5>
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
@@ -83,32 +83,27 @@
 
                                             <div class="form-group mb-3">
                                                 <label for="simpleinput">Folio</label>
-                                                <input type="text" id="txtFolio" class="form-control">
+                                                <input type="text" id="txtFolio" class="form-control" readonly>
                                             </div>
 
                                             <div class="form-group mb-3">
                                                 <label for="example-email">Numero Parte</label>
-                                                <input type="text" id="txtNumeroParte" name="example-email" class="form-control" >
+                                                <input type="text" id="txtNumeroParte" name="example-email" class="form-control" readonly>
                                             </div>
 
                                             <div class="form-group mb-3">
                                                 <label for="example-email">Cantidad</label>
-                                                <input type="text" id="txtCantidad" name="example-email" class="form-control" >
+                                                <input type="text" id="txtCantidad" name="example-email" class="form-control" readonly>
                                             </div>
 
                                             <div class="form-group mb-3">
                                                 <label for="example-email">StorageBin</label>
-                                                <input type="text" id="txtStorageBin" name="example-email" class="form-control" >
+                                                <input type="text" id="txtStorageBin" name="example-email" class="form-control" readonly>
                                             </div>
 
                                             <div class="form-group mb-3">
                                                 <label for="example-email">Storage Type</label>
-                                                <input type="text" id="txtStorageType" name="example-email" class="form-control" >
-                                            </div>
-
-                                            <div class="form-group mb-3">
-                                                <label for="example-email">Usuario</label>
-                                                <input type="text" id="txtUsuario" name="example-email" class="form-control" >
+                                                <input type="text" id="txtStorageType" name="example-email" class="form-control" readonly>
                                             </div>
 
                                             <div id="tablaContainer">
