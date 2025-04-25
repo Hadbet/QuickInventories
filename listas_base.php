@@ -214,6 +214,7 @@
 
                         var formData = new FormData();
                         formData.append('estatus', estatus);
+                        formData.append('marbete', document.getElementById("txtFolio").value);
                         formData.append('sun', SUN);
 
                         fetch('https://grammermx.com/Logistica/QuickInventories/dao/guardarConfiguracionSun.php', {

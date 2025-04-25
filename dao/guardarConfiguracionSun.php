@@ -3,13 +3,14 @@ include_once('db/db_Inventario.php');
 
 $sun = $_POST['sun'];
 $estatus = $_POST['estatus'];
+$marbete = $_POST['marbete'];
 
 try {
     $con = new LocalConector();
     $conex=$con->conectar();
 
-    $stmt = $conex->prepare("UPDATE `Storage_Unit` SET `Estatus`=? WHERE `Id_StorageUnit` = ?");
-    $stmt->bind_param("ss", $estatus,$sun);
+    $stmt = $conex->prepare("UPDATE `Storage_Unit` SET `Estatus`=,`FolioMarbete`=? WHERE `Id_StorageUnit` = ?");
+    $stmt->bind_param("sss", $estatus,$marbete,$sun);
 
     $stmt->execute();
 
