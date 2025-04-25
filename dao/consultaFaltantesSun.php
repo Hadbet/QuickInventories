@@ -13,27 +13,30 @@ try {
 
     $query = "
         SELECT 
-            i.`STLocation`, 
-            i.`STBin`, 
-            i.`STType`, 
-            i.`GrammerNo`, 
-            i.`Cantidad`, 
-            i.`AreaCve`,
-            CONCAT(
-                '<button class=\"btn btn-info text-white\" onclick=\"llenarDatos(\'', 
-                i.`GrammerNo`, '\', \'', 
-                i.`STBin`, '\', \'', 
-                i.`STType`, '\')\">Modificar</button>'
-            ) AS `Boton`
-        FROM `InventarioSap` i
-        WHERE NOT EXISTS (
-            SELECT 1 
-            FROM `Storage_Unit` s
-            WHERE s.`Numero_Parte` = i.`GrammerNo`
-              AND s.`Storage_Bin` = i.`STBin`
-              AND s.`Storage_Type` = i.`STType`
-              AND s.`Estatus` = 1
-        )
+    i.`STLocation`, 
+    i.`STBin`, 
+    i.`STType`, 
+    i.`GrammerNo`, 
+    i.`Cantidad`, 
+    i.`AreaCve`,
+    CONCAT(
+        '<button class=\"btn btn-info text-white\" onclick=\"llenarDatos(\'\', \'', 
+        i.`GrammerNo`, 
+        '\', \'\', \'\', \'', 
+        i.`STBin`, 
+        '\', \'', 
+        i.`STType`, 
+        '\')\">Modificar</button>'
+    ) AS `Boton`
+FROM `InventarioSap` i
+WHERE NOT EXISTS (
+    SELECT 1 
+    FROM `Storage_Unit` s
+    WHERE s.`Numero_Parte` = i.`GrammerNo`
+      AND s.`Storage_Bin` = i.`STBin`
+      AND s.`Storage_Type` = i.`STType`
+      AND s.`Estatus` = 1
+)
     ";
 
     $result = mysqli_query($conex, $query);
