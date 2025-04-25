@@ -65,6 +65,44 @@
                     </div> <!-- end section -->
                 </div> <!-- .col-12 -->
 
+
+                <div class="col-12">
+                    <h2 class="mb-2 page-title">Numeros de parte faltantes por contar</h2>
+                    <div class="row my-4">
+                        <!-- Small table -->
+                        <div class="col-md-12">
+                            <div class="card shadow">
+                                <div class="card-body">
+                                    <!-- table -->
+                                    <table class="table datatables" id="dataTable-2">
+                                        <thead>
+                                        <tr>
+                                            <th>Número de Parte</th>
+                                            <th>StorageBin</th>
+                                            <th>StorageType</th>
+                                            <th>Cantidad</th>
+                                            <th>Mostrar</th>
+                                        </tr>
+                                        </thead>
+                                        <tfoot>
+                                        <tr>
+                                            <th>Número de Parte</th>
+                                            <th>StorageBin</th>
+                                            <th>StorageType</th>
+                                            <th>Cantidad</th>
+                                            <th>Mostrar</th>
+                                        </tr>
+                                        </tfoot>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div> <!-- simple table -->
+                    </div> <!-- end section -->
+                </div> <!-- .col-12 -->
+
                 <div class="col-md-4 mb-4">
                     <div class="card shadow">
                         <div class="card-body">
@@ -286,6 +324,63 @@
                     { data: 'Estatus' },
                     { data: 'Boton' }
                 ],
+                autoWidth: true,
+                "lengthMenu": [
+                    [16, 32, 64, -1],
+                    [16, 32, 64, "All"]
+                ],
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'copy',
+                        className: 'btn btn-sm copyButton'
+                    },
+                    {
+                        extend: 'csv',
+                        className: 'btn btn-sm csvButton'
+                    },
+                    {
+                        extend: 'excel',
+                        className: 'btn btn-sm excelButton'
+                    },
+                    {
+                        extend: 'pdf',
+                        className: 'btn btn-sm pdfButton'
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn btn-sm printButton'
+                    }
+                ],
+                initComplete: function () {
+                    this.api().columns().every( function () {
+                        var column = this;
+                        var input = document.createElement("input");
+                        input.className = 'form-control form-control-sm';
+                        $(input).appendTo($(column.footer()).empty())
+                            .on('keyup change clear', function () {
+                                if (column.search() !== this.value) {
+                                    column.search(this.value).draw();
+                                }
+                            });
+                    });
+                }
+            });
+        }
+    });
+
+    $.ajax({
+        url: 'https://grammermx.com/Logistica/QuickInventories/dao/consultaFaltantesSun.php', // Reemplaza esto con la URL de tus datos
+        dataType: 'json',
+        success: function(data) {
+            var table = $('#dataTable-2').DataTable({
+                data: data.data,
+                columns: [
+                    { data: 'GrammerNo' },
+                    { data: 'STBin' },
+                    { data: 'STType' },
+                    { data: 'Cantidad' },
+                    { data: 'Boton' }
                 autoWidth: true,
                 "lengthMenu": [
                     [16, 32, 64, -1],
