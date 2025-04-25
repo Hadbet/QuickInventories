@@ -366,6 +366,7 @@
                 }else{
                     console.log("Terminado");
                     document.getElementById("btnModalClose").click();
+                    location.reload();
                 }
             })
             .catch(error => {
