@@ -344,7 +344,7 @@
     function guardarConfiguracion() {
 
         var formData = new FormData();
-        formData.append('estatus', document.getElementById("txtCantidad").value);
+        formData.append('cantidad', document.getElementById("txtCantidad").value);
         formData.append('marbete', document.getElementById("txtFolio").value);
 
         fetch('https://grammermx.com/Logistica/QuickInventories/dao/guardarConfiguracion.php', {
