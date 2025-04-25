@@ -197,7 +197,6 @@
                     checkbox.className = 'estatus-checkbox';
                     checkbox.checked = item.Estatus == 1; // true si Estatus es 1
 
-                    // Añadir evento para detectar cambios
                     checkbox.addEventListener('change', function() {
                         const SUN = this.closest('tr').cells[0].textContent;
                         const CANTIDADSUN = this.closest('tr').cells[1].textContent;
@@ -207,53 +206,46 @@
 
                         if (nuevoEstado){
                             estatus = '1';
-                            document.getElementById("txtCantidad").value = parseFloat(document.getElementById("txtCantidad").value)+parseFloat(CANTIDADSUN);
-                        }else{
+                            document.getElementById("txtCantidad").value = parseFloat(document.getElementById("txtCantidad").value) + parseFloat(CANTIDADSUN);
+                        } else {
                             estatus = '0';
-                            document.getElementById("txtCantidad").value = parseFloat(document.getElementById("txtCantidad").value)-parseFloat(CANTIDADSUN);
+                            document.getElementById("txtCantidad").value = parseFloat(document.getElementById("txtCantidad").value) - parseFloat(CANTIDADSUN);
                         }
 
                         var formData = new FormData();
                         formData.append('estatus', estatus);
-                        formData.append('sun',  SUN);
+                        formData.append('sun', SUN);
 
                         fetch('https://grammermx.com/Logistica/QuickInventories/dao/guardarConfiguracionSun.php', {
                             method: 'POST',
                             body: formData
                         })
                             .then(response => {
-                                if (!response.ok) { // Verifica si la respuesta HTTP falló (4xx-5xx)
+                                if (!response.ok) {
                                     throw new Error(`Error HTTP: ${response.status}`);
                                 }
-                                return response.json().catch(() => {
-                                    throw new Error("La respuesta no es JSON válido");
-                                });
+                                return response.json();
                             })
                             .then(data => {
                                 if (!data) {
                                     throw new Error("Respuesta vacía del servidor");
                                 }
-
-                                if (data.success) {
-                                    console.log("Configuración guardada exitosamente");
-                                } else {
-                                    console.error("Error en la operación:", data.message || "Sin mensaje de error");
-                                    const failedUnits = data.message || "No se especificaron unidades";
-                                    console.log("Unidades fallidas:", failedUnits);
+                                if (!data.success) {
+                                    console.error("Error en la operación:", data.message);
                                 }
                             })
                             .catch(error => {
-                                console.error("Error en la petición fetch:", error.message);
+                                console.error("Error:", error.message);
+                                // Revertir cambios si falla
+                                this.checked = !nuevoEstado;
+                                document.getElementById("txtCantidad").value = parseFloat(document.getElementById("txtCantidad").value) + (nuevoEstado ? -parseFloat(CANTIDADSUN) : parseFloat(CANTIDADSUN));
                             });
+                    }); // <-- ¡Esta llave estaba faltando!
 
                     cellEstatus.appendChild(checkbox);
-
-                    // Añadir celdas a la fila
                     row.appendChild(cellSUN);
                     row.appendChild(cellCantidad);
                     row.appendChild(cellEstatus);
-
-                    // Añadir fila al tbody
                     tbody.appendChild(row);
                 }
 
