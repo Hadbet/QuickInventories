@@ -262,6 +262,8 @@
                                 .then(response => {
                                     if (!response.ok) {
                                         throw new Error(`Error HTTP: ${response.status}`);
+                                    }else{
+                                        guardarConfiguracion();
                                     }
                                     return response.json();
                                 })
@@ -472,8 +474,6 @@
                     console.error("Error en la operación:", data.message);
                 }else{
                     console.log("Terminado");
-                    document.getElementById("btnModalClose").click();
-                    location.reload();
                 }
             })
             .catch(error => {
