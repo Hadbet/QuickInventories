@@ -278,6 +278,14 @@ if (strlen($nomina) == 7) {
 
             }
         });
+
+        $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaReporteSapGeneralCosto.php', function (data) {
+            for (var i = 0; i < data.data.length; i++) {
+
+                document.getElementById("costoNegativo").innerText = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(data.data[i].ValorTotalGeneral );
+
+            }
+        });
     }
 
     $('#data-table').find('td').each(function(){
