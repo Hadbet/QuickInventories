@@ -150,7 +150,7 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" id="btnModalClose" class="btn mb-2 btn-secondary" data-dismiss="modal">Cerrar</button>
-                                            <button type="button" onclick="guardarConfiguracion();" class="btn mb-2 btn-primary">Guardar cambios</button>
+                                            <button type="button" onclick="guardarConfiguracion();" id="btnGuardarModal" class="btn mb-2 btn-primary">Guardar cambios</button>
                                         </div>
                                     </div>
                                 </div>
@@ -428,6 +428,15 @@
     });
 
     function llenarDatos(idBitacora,numeroParte,comentario,primerConteo,storageBin,storageTipe) {
+
+        if (idBitacora===""){
+            document.getElementById("btnGuardarModal").style.display = "none";
+            document.querySelector(".estatus-checkbox").style.display = "block";
+        }else{
+            document.getElementById("btnGuardarModal").style.display = "block";
+            document.querySelector(".estatus-checkbox").style.display = "block";
+        }
+
         document.getElementById("txtFolio").value = idBitacora;
         document.getElementById("txtNumeroParte").value = numeroParte;
         document.getElementById("txtCantidad").value = primerConteo;
