@@ -67,7 +67,7 @@
 
 
                 <div class="col-12">
-                    <h2 class="mb-2 page-title">Numeros de parte faltantes por contar</h2>
+                    <h2 class="mb-2 page-title">Números de parte faltantes por capturar</h2>
                     <div class="row my-4">
                         <!-- Small table -->
                         <div class="col-md-12">
@@ -221,7 +221,6 @@
                     const cellSUN = document.createElement('td');
                     cellSUN.textContent = item.Id_StorageUnit || 'N/A';
 
-                    // Celda Cantidad
                     const cellCantidad = document.createElement('td');
                     cellCantidad.textContent = item.Cantidad || '0';
 

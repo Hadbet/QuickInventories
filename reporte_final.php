@@ -162,8 +162,8 @@ if (strlen($nomina) == 7) {
                                         </div>
                                         <div class="col pr-0">
                                             <!--<p class="small mb-0 text-white">Costo Positivas</p>-->
-                                            <p class="small mb-0 text-white" >Valor Contador</p>
-                                            <span class="h3 mb-0 text-white" id="costoPositivo"></span>
+                                            <p class="small mb-0 text-white" >Valor Contado</p>
+                                            <span class="h3 mb-0 text-white" id="costoContado"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -271,13 +271,10 @@ if (strlen($nomina) == 7) {
 
     estatusConteo();
     function estatusConteo() {
-        $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaReporteFinalDetalles.php', function (data) {
+        $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaReporteConteoGeneralCosto.php', function (data) {
             for (var i = 0; i < data.data.length; i++) {
 
-                document.getElementById("costoNegativo").innerText = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(data.data[i].Costo_Total_Negativo);
-                document.getElementById("costoPositivo").innerText = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(data.data[i].Costo_Total_Positivo);
-                document.getElementById("partesNegativo").innerText=data.data[i].Cantidad_Total_Negativa;
-                document.getElementById("partesPositivo").innerText=data.data[i].Cantidad_Total_Positiva;
+                document.getElementById("costoContado").innerText = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(data.data[i].ValorTotalGeneral);
 
             }
         });
