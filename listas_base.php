@@ -178,7 +178,7 @@
 
 <script>
 
-    function buscarDatos() {
+    function buscarDatos(idBitacora) {
         // Obtener los valores de los inputs
         const numeroParte = document.getElementById('txtNumeroParte').value;
         const storageBin = document.getElementById('txtStorageBin').value;
@@ -232,51 +232,55 @@
                     checkbox.className = 'estatus-checkbox';
                     checkbox.checked = item.Estatus == 1; // true si Estatus es 1
 
-                    checkbox.addEventListener('change', function() {
-                        const SUN = this.closest('tr').cells[0].textContent;
-                        const CANTIDADSUN = this.closest('tr').cells[1].textContent;
-                        const nuevoEstado = this.checked;
-                        var estatus;
-                        console.log(`SUN: ${SUN}, Nuevo estado: ${nuevoEstado ? 'Contado' : 'No contado'}`);
+                    if (idBitacora===""){
 
-                        if (nuevoEstado){
-                            estatus = '1';
-                            document.getElementById("txtCantidad").value = parseFloat(document.getElementById("txtCantidad").value) + parseFloat(CANTIDADSUN);
-                        } else {
-                            estatus = '0';
-                            document.getElementById("txtCantidad").value = parseFloat(document.getElementById("txtCantidad").value) - parseFloat(CANTIDADSUN);
-                        }
+                    }else {
+                        checkbox.addEventListener('change', function() {
+                            const SUN = this.closest('tr').cells[0].textContent;
+                            const CANTIDADSUN = this.closest('tr').cells[1].textContent;
+                            const nuevoEstado = this.checked;
+                            var estatus;
+                            console.log(`SUN: ${SUN}, Nuevo estado: ${nuevoEstado ? 'Contado' : 'No contado'}`);
 
-                        var formData = new FormData();
-                        formData.append('estatus', estatus);
-                        formData.append('marbete', document.getElementById("txtFolio").value);
-                        formData.append('sun', SUN);
+                            if (nuevoEstado){
+                                estatus = '1';
+                                document.getElementById("txtCantidad").value = parseFloat(document.getElementById("txtCantidad").value) + parseFloat(CANTIDADSUN);
+                            } else {
+                                estatus = '0';
+                                document.getElementById("txtCantidad").value = parseFloat(document.getElementById("txtCantidad").value) - parseFloat(CANTIDADSUN);
+                            }
 
-                        fetch('https://grammermx.com/Logistica/QuickInventories/dao/guardarConfiguracionSun.php', {
-                            method: 'POST',
-                            body: formData
-                        })
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error(`Error HTTP: ${response.status}`);
-                                }
-                                return response.json();
+                            var formData = new FormData();
+                            formData.append('estatus', estatus);
+                            formData.append('marbete', document.getElementById("txtFolio").value);
+                            formData.append('sun', SUN);
+
+                            fetch('https://grammermx.com/Logistica/QuickInventories/dao/guardarConfiguracionSun.php', {
+                                method: 'POST',
+                                body: formData
                             })
-                            .then(data => {
-                                if (!data) {
-                                    throw new Error("Respuesta vacía del servidor");
-                                }
-                                if (!data.success) {
-                                    console.error("Error en la operación:", data.message);
-                                }
-                            })
-                            .catch(error => {
-                                console.error("Error:", error.message);
-                                // Revertir cambios si falla
-                                this.checked = !nuevoEstado;
-                                document.getElementById("txtCantidad").value = parseFloat(document.getElementById("txtCantidad").value) + (nuevoEstado ? -parseFloat(CANTIDADSUN) : parseFloat(CANTIDADSUN));
-                            });
-                    }); // <-- ¡Esta llave estaba faltando!
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error(`Error HTTP: ${response.status}`);
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    if (!data) {
+                                        throw new Error("Respuesta vacía del servidor");
+                                    }
+                                    if (!data.success) {
+                                        console.error("Error en la operación:", data.message);
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error("Error:", error.message);
+                                    // Revertir cambios si falla
+                                    this.checked = !nuevoEstado;
+                                    document.getElementById("txtCantidad").value = parseFloat(document.getElementById("txtCantidad").value) + (nuevoEstado ? -parseFloat(CANTIDADSUN) : parseFloat(CANTIDADSUN));
+                                });
+                        }); // <-- ¡Esta llave estaba faltando!
+                    }
 
                     cellEstatus.appendChild(checkbox);
                     row.appendChild(cellSUN);
@@ -431,10 +435,8 @@
 
         if (idBitacora===""){
             document.getElementById("btnGuardarModal").style.display = "none";
-            document.querySelector(".estatus-checkbox").style.display = "block";
         }else{
             document.getElementById("btnGuardarModal").style.display = "block";
-            document.querySelector(".estatus-checkbox").style.display = "block";
         }
 
         document.getElementById("txtFolio").value = idBitacora;
@@ -443,7 +445,7 @@
         document.getElementById("txtStorageBin").value = storageBin;
         document.getElementById("txtStorageType").value = storageTipe;
         document.getElementById("btnEntrar").click();
-        buscarDatos();
+        buscarDatos(idBitacora);
     }
 
     function guardarConfiguracion() {
