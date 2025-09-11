@@ -234,7 +234,7 @@
                     <td class="p-3">${item.Description}</td>
                     <td class="p-3">${item.AvadaibleStock} ${item.UnidadMedida}</td>
                     <td class="p-3">
-                        <input type="number" step="any" placeholder="0.00" class="w-32 p-2 border border-slate-300 rounded-md focus:ring-orange-500 focus:border-orange-500 quantity-input">
+                        <input type="number" value="${item.AvadaibleStock}" step="any" placeholder="0.00" class="w-32 p-2 border border-slate-300 rounded-md focus:ring-orange-500 focus:border-orange-500 quantity-input">
                     </td>
                     <td class="p-3">
                         <input type="text" placeholder="Comentario..." class="w-full p-2 border border-slate-300 rounded-md focus:ring-orange-500 focus:border-orange-500 comment-input">
