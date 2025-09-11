@@ -80,7 +80,17 @@
         </div>
     </div>
     <!-- Mobile Menu -->
-    <div id="mobile-menu" class="md:hidden hidden"><div class="px-2 pt-2 pb-3 space-y-1 sm:px-3"></div></div>
+    <div id="mobile-menu" class="md:hidden hidden">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            <a href="index.html" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Inicio</span></a>
+            <a href="index.html" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Carga</span></a>
+            <a href="#" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Producción</span></a>
+            <a href="almacen.html" class="block nav-link active flex items-center space-x-2 px-3 py-2 text-base font-medium"><span>Almacén</span></a>
+            <a href="#" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Location</span></a>
+            <a href="#" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Usuarios</span></a>
+            <a href="#" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Salir</span></a>
+        </div>
+    </div>
 </nav>
 
 <main>
@@ -141,8 +151,19 @@
         const resultsTbody = document.getElementById('results-tbody');
         const notificationArea = document.getElementById('notification-area');
         const captureButton = document.getElementById('capture-button');
+        const menuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const openIcon = document.getElementById('menu-open-icon');
+        const closeIcon = document.getElementById('menu-close-icon');
 
         let scannedItems = new Set();
+
+        menuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            openIcon.classList.toggle('hidden');
+            openIcon.classList.toggle('inline-flex');
+            closeIcon.classList.toggle('hidden');
+        });
 
         sunInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && sunInput.value.trim() !== '') {
@@ -181,7 +202,8 @@
 
         function addItemsToTable(items) {
             items.forEach(item => {
-                if (scannedItems.has(item.Sun)) return;
+                // CORRECCIÓN: Chequeo más robusto para evitar errores si el item es inválido
+                if (!item || !item.Sun || scannedItems.has(item.Sun)) return;
 
                 scannedItems.add(item.Sun);
                 const row = document.createElement('tr');
@@ -201,7 +223,6 @@
                     <td class="p-3">${item.Sun}</td>
                 `;
                 resultsTbody.appendChild(row);
-                // Enfocar el campo de cantidad del nuevo elemento
                 row.querySelector('.quantity-input').focus();
             });
         }
@@ -279,7 +300,8 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    if(result.value.success) {
+                    // CORRECCIÓN: Se agrega un chequeo para asegurar que 'result.value.data' exista
+                    if(result.value.success && result.value.data) {
                         Swal.fire({
                             title: '¡Éxito!',
                             text: 'Nuevo material registrado y agregado a la lista.',
@@ -291,7 +313,8 @@
                         resultsArea.classList.remove('hidden');
                         addItemsToTable([newItem]);
                     } else {
-                        Swal.fire('Error', `No se pudo registrar: ${result.value.message}`, 'error');
+                        // CORRECCIÓN: Mensaje de error más claro si falla el registro o la respuesta del servidor
+                        Swal.fire('Error', `No se pudo registrar. Respuesta del servidor: ${result.value.message || 'Sin detalles.'}`, 'error');
                     }
                 }
             });
