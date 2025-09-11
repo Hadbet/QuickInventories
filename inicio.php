@@ -6,8 +6,8 @@
     <title>Grammer Quick Inventor</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PapaParse for CSV -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <!-- SheetJS (xlsx.js) for reading Excel files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         .upload-card {
             @apply bg-white rounded-2xl shadow-lg p-8 text-center transition-all duration-300;
@@ -91,7 +91,7 @@
                 <span class="inline-block bg-orange-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-orange-600 transition-colors">Seleccionar Archivo</span>
                 <p id="lx02-filename" class="mt-4 text-sm text-slate-600 truncate"></p>
             </label>
-            <input type="file" id="lx02-file" accept=".csv, .xlsx, .xls">
+            <input type="file" id="lx02-file" accept=".xlsx, .xls">
             <button id="process-lx02" class="mt-4 w-full bg-slate-800 text-white font-bold py-3 px-8 rounded-lg hover:bg-slate-900 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed" disabled>
                 Procesar y Cargar
             </button>
@@ -129,7 +129,7 @@
         closeIcon.classList.toggle('hidden');
     });
 
-    // --- File Handling Logic (Simplified, AI removed) ---
+    // --- Excel File Handling Logic using SheetJS ---
     fileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (!file) {
@@ -138,18 +138,29 @@
         }
 
         filenameDisplay.textContent = file.name;
-        showNotification('Archivo listo para procesar.', 'blue');
+        showNotification('Archivo listo. Procesando contenido...', 'blue');
 
-        Papa.parse(file, {
-            delimiter: "\t",
-            complete: (results) => handleParsingComplete(results),
-            error: (err) => handleParsingError(err)
-        });
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                // Convert sheet to array of arrays, starting from row 0
+                const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                handleParsingComplete(sheetData);
+            } catch (err) {
+                handleParsingError('Error al procesar el archivo Excel.');
+            }
+        };
+        reader.onerror = () => handleParsingError('Error al leer el archivo.');
+        reader.readAsArrayBuffer(file);
     });
 
-    function handleParsingComplete(results) {
-        const data = results.data;
-        const dataStartIndex = 6;
+    function handleParsingComplete(data) {
+        // According to the format, data starts around row 8 (index 7)
+        const dataStartIndex = 7;
 
         if (data.length < dataStartIndex) {
             showNotification('El archivo no tiene el formato esperado o está vacío.', 'red');
@@ -158,23 +169,28 @@
         }
 
         inventoryItems = data.slice(dataStartIndex).map(row => {
-            if (row.length < 11 || !row[0]) return null;
+            // Check if the first column (Material) exists and is not empty
+            if (row.length < 9 || !row[0]) return null;
+
+            // Clean up stock number by removing commas
+            const stockString = String(row[7] || '0').replace(/,/g, '');
+
             return {
-                Material: row[0]?.trim(),
-                Plant: row[1]?.trim(),
-                StorageLocation: row[2]?.trim(),
-                Description: row[3]?.trim(),
-                StorageType: row[4]?.trim(),
-                StorageBin: row[6]?.trim(),
-                AvadaibleStock: parseFloat(row[7]?.trim().replace(',', '') || 0),
-                UnidadMedida: row[8]?.trim(),
-                Sun: row[10]?.trim() || '',
+                Material: String(row[0]).trim(),
+                Plant: String(row[1]).trim(),
+                StorageLocation: String(row[2]).trim(),
+                Description: String(row[3]).trim(),
+                StorageType: String(row[4]).trim(),
+                StorageBin: String(row[6]).trim(),
+                AvadaibleStock: parseFloat(stockString),
+                UnidadMedida: String(row[8]).trim(),
+                Sun: String(row[11] || '').trim(), // 'Sun' is now Batch
                 CantidadContada: 0,
-                UsuarioContador: '',
+                UsuarioContador: 'Carga Masiva LX02',
                 Comentario: '',
-                Tipo: ''
+                Tipo: 'LX02'
             };
-        }).filter(item => item !== null);
+        }).filter(item => item !== null && item.Material); // Filter out nulls and rows without Material
 
         if (inventoryItems.length > 0) {
             showNotification(`Se encontraron ${inventoryItems.length} registros válidos. Listo para procesar.`, 'green');
@@ -185,8 +201,8 @@
         }
     }
 
-    function handleParsingError(err) {
-        showNotification('Error al leer el archivo: ' + err, 'red');
+    function handleParsingError(message) {
+        showNotification(message, 'red');
         resetFileState();
     }
 
@@ -208,9 +224,10 @@
         sendDataToBackend(inventoryItems);
     });
 
+    // --- Backend Communication ---
     async function sendDataToBackend(data) {
         try {
-            const response = await fetch('dao/cargaBaseDatos.php', {
+            const response = await fetch('upload_lx02.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
