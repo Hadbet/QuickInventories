@@ -170,9 +170,9 @@
                 UnidadMedida: row[8]?.trim(),
                 Sun: row[10]?.trim() || '',
                 CantidadContada: 0,
-                UsuarioContador: 'Carga Masiva LX02',
+                UsuarioContador: '',
                 Comentario: '',
-                Tipo: 'LX02'
+                Tipo: ''
             };
         }).filter(item => item !== null);
 
