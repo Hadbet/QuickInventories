@@ -171,7 +171,7 @@
         // B=1, D=3, E=4, F=5, G=6, I=8, J=9, K=10, O=14
         inventoryItems = data.slice(dataStartIndex).map(row => {
             // Se valida que la fila tenga suficientes columnas y que el Material (columna B) no esté vacío.
-            if (row.length < 15 || !row[1]) return null;
+            if (row.length < 2 || !row[1]) return null;
 
             // Limpia el número de stock, quitando comas.
             const stockString = String(row[9] || '0').replace(/,/g, '');
@@ -181,8 +181,8 @@
                 Plant: String(row[3]).trim(),
                 StorageLocation: String(row[4]).trim(),
                 Description: String(row[5]).trim(),
-                StorageType: String(row[6]).trim(),
-                StorageBin: String(row[8]).trim(),
+                StorageType: String(row[6] || '').trim(),
+                StorageBin: String(row[8] || '').trim(),
                 AvadaibleStock: parseFloat(stockString),
                 UnidadMedida: String(row[10]).trim(),
                 Sun: String(row[14] || '').trim(), // Columna O es Storage Unit
@@ -228,7 +228,7 @@
     // --- Backend Communication ---
     async function sendDataToBackend(data) {
         try {
-            const response = await fetch('https://grammermx.com/Logistica/QuickInventories/dao/cargaBaseDatos.php', {
+            const response = await fetch('upload_lx02.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
