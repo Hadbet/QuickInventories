@@ -116,7 +116,7 @@
         <div id="notification-area" class="max-w-4xl mx-auto mt-6"></div>
 
         <!-- Results Area -->
-        <div id="results-area" class="mt-8 max-w-6xl mx-auto hidden">
+        <div id="results-area" class="mt-8 max-w-7xl mx-auto hidden">
             <div class="bg-white p-6 rounded-2xl shadow-lg overflow-x-auto">
                 <h3 class="text-2xl font-bold text-slate-800 mb-4">Materiales a Contar</h3>
                 <table class="w-full text-left">
@@ -128,6 +128,7 @@
                         <th class="p-3">Cantidad Contada</th>
                         <th class="p-3">Comentarios</th>
                         <th class="p-3">SUN</th>
+                        <th class="p-3 text-center">Acción</th>
                     </tr>
                     </thead>
                     <tbody id="results-tbody">
@@ -202,7 +203,6 @@
 
         function addItemsToTable(items) {
             items.forEach(item => {
-                // CORRECCIÓN: Chequeo más robusto para evitar errores si el item es inválido
                 if (!item || !item.Sun || scannedItems.has(item.Sun)) return;
 
                 scannedItems.add(item.Sun);
@@ -210,65 +210,71 @@
                 row.className = 'border-b border-slate-200 hover:bg-slate-50';
                 row.dataset.id = item.IdInventario;
 
+                // Safely parse the stock number
+                const stock = parseFloat(String(item.AvadaibleStock).replace(/,/g, '')) || 0;
+
                 row.innerHTML = `
                     <td class="p-3">${item.Material}</td>
                     <td class="p-3">${item.Description}</td>
-                    <td class="p-3">${item.AvadaibleStock} ${item.UnidadMedida}</td>
+                    <td class="p-3">${stock} ${item.UnidadMedida}</td>
                     <td class="p-3">
-                        <input type="number" value="${item.AvadaibleStock}" step="any" placeholder="0.00" class="w-32 p-2 border border-slate-300 rounded-md focus:ring-orange-500 focus:border-orange-500 quantity-input">
+                        <input type="number" value="${stock}" step="any" placeholder="0.00" class="w-32 p-2 border border-slate-300 rounded-md focus:ring-orange-500 focus:border-orange-500 quantity-input">
                     </td>
                     <td class="p-3">
                         <input type="text" placeholder="Comentario..." class="w-full p-2 border border-slate-300 rounded-md focus:ring-orange-500 focus:border-orange-500 comment-input">
                     </td>
-                    <td class="p-3">${item.Sun}</td>
+                    <td class="p-3 font-mono">${item.Sun}</td>
+                    <td class="p-3 text-center">
+                        <button class="text-red-500 hover:text-red-700 delete-btn" title="Eliminar fila">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </td>
                 `;
                 resultsTbody.appendChild(row);
                 row.querySelector('.quantity-input').focus();
             });
         }
 
+        resultsTbody.addEventListener('click', (e) => {
+            const deleteButton = e.target.closest('.delete-btn');
+            if (deleteButton) {
+                const row = deleteButton.closest('tr');
+                const sunCell = row.cells[5]; // SUN is the 6th cell (index 5)
+                if(sunCell) {
+                    const sunToRemove = sunCell.textContent;
+                    scannedItems.delete(sunToRemove);
+                }
+                row.remove();
+                if (resultsTbody.rows.length === 0) {
+                    resultsArea.classList.add('hidden');
+                }
+            }
+        });
+
         function showNewItemModal(sunValue) {
             Swal.fire({
                 title: 'Registrar Nuevo Material',
                 html: `
                     <div class="text-left space-y-4 p-4">
-                        <div>
-                            <label for="modal-material" class="block font-medium text-slate-700 mb-1">Número de Parte (Material) *</label>
-                            <input type="text" id="modal-material" class="swal2-input w-full">
-                        </div>
-                        <div>
-                            <label for="modal-description" class="block font-medium text-slate-700 mb-1">Descripción *</label>
-                            <input type="text" id="modal-description" class="swal2-input w-full">
-                        </div>
-                        <div>
-                            <label for="modal-storagetype" class="block font-medium text-slate-700 mb-1">Storage Type</label>
-                            <input type="text" id="modal-storagetype" class="swal2-input w-full">
-                        </div>
-                        <div>
-                            <label for="modal-storagebin" class="block font-medium text-slate-700 mb-1">Storage Bin</label>
-                            <input type="text" id="modal-storagebin" class="swal2-input w-full">
-                        </div>
+                        <div><label for="modal-material" class="block font-medium text-slate-700 mb-1">Número de Parte (Material) *</label><input type="text" id="modal-material" class="swal2-input w-full"></div>
+                        <div><label for="modal-description" class="block font-medium text-slate-700 mb-1">Descripción *</label><input type="text" id="modal-description" class="swal2-input w-full"></div>
+                        <div><label for="modal-storagetype" class="block font-medium text-slate-700 mb-1">Storage Type</label><input type="text" id="modal-storagetype" class="swal2-input w-full"></div>
+                        <div><label for="modal-storagebin" class="block font-medium text-slate-700 mb-1">Storage Bin</label><input type="text" id="modal-storagebin" class="swal2-input w-full"></div>
                         <div class="flex space-x-4">
-                            <div class="flex-1">
-                                <label for="modal-quantity" class="block font-medium text-slate-700 mb-1">Cantidad Contada *</label>
-                                <input type="number" step="any" id="modal-quantity" class="swal2-input w-full">
-                            </div>
-                            <div class="flex-1">
-                                <label for="modal-unit" class="block font-medium text-slate-700 mb-1">Unidad de Medida *</label>
-                                <input type="text" id="modal-unit" class="swal2-input w-full">
-                            </div>
+                            <div class="flex-1"><label for="modal-quantity" class="block font-medium text-slate-700 mb-1">Cantidad Contada *</label><input type="number" step="any" id="modal-quantity" class="swal2-input w-full"></div>
+                            <div class="flex-1"><label for="modal-unit" class="block font-medium text-slate-700 mb-1">Unidad de Medida *</label><input type="text" id="modal-unit" class="swal2-input w-full"></div>
                         </div>
                     </div>
                 `,
-                confirmButtonText: 'Registrar y Agregar a la Lista',
+                confirmButtonText: 'Registrar y Agregar',
                 confirmButtonColor: '#ea580c',
                 showCancelButton: true,
                 cancelButtonText: 'Cancelar',
                 focusConfirm: false,
                 width: '48rem',
-                didOpen: () => {
-                    document.getElementById('modal-material').focus();
-                },
+                didOpen: () => { document.getElementById('modal-material').focus(); },
                 preConfirm: () => {
                     const newItemData = {
                         Sun: sunValue,
@@ -285,13 +291,14 @@
                         return false;
                     }
 
+                    Swal.showLoading();
                     return fetch('https://grammermx.com/Logistica/QuickInventories/dao/insert_inventory.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(newItemData)
                     })
                         .then(response => {
-                            if (!response.ok) throw new Error(response.statusText);
+                            if (!response.ok) throw new Error(`Error del Servidor: ${response.statusText}`);
                             return response.json();
                         })
                         .catch(error => {
@@ -300,21 +307,16 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // CORRECCIÓN: Se agrega un chequeo para asegurar que 'result.value.data' exista
-                    if(result.value.success && result.value.data) {
+                    const serverResponse = result.value;
+                    if (serverResponse && serverResponse.success && serverResponse.data) {
                         Swal.fire({
-                            title: '¡Éxito!',
-                            text: 'Nuevo material registrado y agregado a la lista.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false
+                            title: '¡Éxito!', text: 'Nuevo material agregado a la lista.',
+                            icon: 'success', timer: 2000, showConfirmButton: false
                         });
-                        const newItem = result.value.data;
                         resultsArea.classList.remove('hidden');
-                        addItemsToTable([newItem]);
+                        addItemsToTable([serverResponse.data]);
                     } else {
-                        // CORRECCIÓN: Mensaje de error más claro si falla el registro o la respuesta del servidor
-                        Swal.fire('Error', `No se pudo registrar. Respuesta del servidor: ${result.value.message || 'Sin detalles.'}`, 'error');
+                        Swal.fire('Error', `No se pudo registrar: ${serverResponse ? serverResponse.message : 'Respuesta inválida.'}`, 'error');
                     }
                 }
             });
@@ -332,7 +334,7 @@
                 }
                 itemsToUpdate.push({
                     IdInventario: row.dataset.id,
-                    CantidadContada: quantityInput.value || 0, // Enviar 0 si está vacío
+                    CantidadContada: quantityInput.value || 0,
                     Comentario: row.querySelector('.comment-input').value
                 });
             });
@@ -345,41 +347,30 @@
             if (hasEmptyQuantities) {
                 const confirmation = await Swal.fire({
                     title: 'Cantidades Vacías',
-                    text: "Algunos campos de 'Cantidad Contada' están vacíos. Se guardarán como 0. ¿Deseas continuar?",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ea580c',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Sí, continuar',
-                    cancelButtonText: 'No, déjame revisar'
+                    text: "Algunos campos de 'Cantidad Contada' están vacíos y se guardarán como 0. ¿Deseas continuar?",
+                    icon: 'warning', showCancelButton: true, confirmButtonColor: '#ea580c',
+                    cancelButtonColor: '#64748b', confirmButtonText: 'Sí, continuar', cancelButtonText: 'No, déjame revisar'
                 });
-                if (!confirmation.isConfirmed) {
-                    return;
-                }
+                if (!confirmation.isConfirmed) return;
             }
 
             try {
                 const response = await fetch('https://grammermx.com/Logistica/QuickInventories/dao/update_inventory.php', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(itemsToUpdate)
                 });
                 const result = await response.json();
 
                 if (result.success) {
                     Swal.fire({
-                        title: '¡Conteo Guardado!',
-                        text: result.message,
-                        icon: 'success',
-                        confirmButtonColor: '#ea580c'
+                        title: '¡Conteo Guardado!', text: result.message,
+                        icon: 'success', confirmButtonColor: '#ea580c'
                     }).then(() => {
                         resultsTbody.innerHTML = '';
                         resultsArea.classList.add('hidden');
                         scannedItems.clear();
                     });
-                } else {
-                    throw new Error(result.message);
-                }
+                } else { throw new Error(result.message); }
             } catch(error) {
                 Swal.fire('Error', `Ocurrió un error al guardar: ${error.message}`, 'error');
             }
@@ -393,9 +384,7 @@
                 orange: 'bg-orange-100 border-orange-400 text-orange-700',
             };
             notificationArea.innerHTML = `<div class="border-l-4 p-4 ${colorClasses[color]}" role="alert"><p>${message}</p></div>`;
-            setTimeout(() => {
-                notificationArea.innerHTML = '';
-            }, 4000);
+            setTimeout(() => { notificationArea.innerHTML = ''; }, 4000);
         }
     });
 </script>
