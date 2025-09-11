@@ -129,7 +129,7 @@
         closeIcon.classList.toggle('hidden');
     });
 
-    // --- Excel File Handling Logic using SheetJS ---
+    // --- Excel File Handling Logic ---
     fileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (!file) {
@@ -147,7 +147,6 @@
                 const workbook = XLSX.read(data, { type: 'array' });
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
-                // Convert sheet to array of arrays, starting from row 0
                 const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
                 handleParsingComplete(sheetData);
             } catch (err) {
@@ -159,44 +158,46 @@
     });
 
     function handleParsingComplete(data) {
-        // According to the format, data starts around row 8 (index 7)
+        // Corregido: Los datos empiezan en la fila 8 (índice 7 del array)
         const dataStartIndex = 7;
 
-        if (data.length < dataStartIndex) {
+        if (data.length <= dataStartIndex) {
             showNotification('El archivo no tiene el formato esperado o está vacío.', 'red');
             resetFileState();
             return;
         }
 
+        // Corregido: Mapeo de columnas según el formato real del Excel.
+        // B=1, D=3, E=4, F=5, G=6, I=8, J=9, K=10, O=14
         inventoryItems = data.slice(dataStartIndex).map(row => {
-            // Check if the first column (Material) exists and is not empty
-            if (row.length < 9 || !row[0]) return null;
+            // Se valida que la fila tenga suficientes columnas y que el Material (columna B) no esté vacío.
+            if (row.length < 15 || !row[1]) return null;
 
-            // Clean up stock number by removing commas
-            const stockString = String(row[7] || '0').replace(/,/g, '');
+            // Limpia el número de stock, quitando comas.
+            const stockString = String(row[9] || '0').replace(/,/g, '');
 
             return {
-                Material: String(row[0]).trim(),
-                Plant: String(row[1]).trim(),
-                StorageLocation: String(row[2]).trim(),
-                Description: String(row[3]).trim(),
-                StorageType: String(row[4]).trim(),
-                StorageBin: String(row[6]).trim(),
+                Material: String(row[1]).trim(),
+                Plant: String(row[3]).trim(),
+                StorageLocation: String(row[4]).trim(),
+                Description: String(row[5]).trim(),
+                StorageType: String(row[6]).trim(),
+                StorageBin: String(row[8]).trim(),
                 AvadaibleStock: parseFloat(stockString),
-                UnidadMedida: String(row[8]).trim(),
-                Sun: String(row[11] || '').trim(), // 'Sun' is now Batch
+                UnidadMedida: String(row[10]).trim(),
+                Sun: String(row[14] || '').trim(), // Columna O es Storage Unit
                 CantidadContada: 0,
                 UsuarioContador: 'Carga Masiva LX02',
                 Comentario: '',
                 Tipo: 'LX02'
             };
-        }).filter(item => item !== null && item.Material); // Filter out nulls and rows without Material
+        }).filter(item => item !== null); // Filtra las filas que no eran válidas (null).
 
         if (inventoryItems.length > 0) {
             showNotification(`Se encontraron ${inventoryItems.length} registros válidos. Listo para procesar.`, 'green');
             processButton.disabled = false;
         } else {
-            showNotification('No se encontraron datos válidos en el archivo.', 'orange');
+            showNotification('No se encontraron datos válidos en el archivo. Revisa el formato y las columnas.', 'orange');
             resetFileState();
         }
     }
