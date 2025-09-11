@@ -160,7 +160,7 @@
             }
 
             try {
-                const response = await fetch(`search_sun.php?sun=${encodeURIComponent(sunValue)}`);
+                const response = await fetch(`https://grammermx.com/Logistica/QuickInventories/dao/search_sun.php?sun=${encodeURIComponent(sunValue)}`);
                 if (!response.ok) throw new Error('Network response was not ok.');
                 const result = await response.json();
 
@@ -193,7 +193,7 @@
                     <td class="p-3">${item.Description}</td>
                     <td class="p-3">${item.AvadaibleStock} ${item.UnidadMedida}</td>
                     <td class="p-3">
-                        <input type="number" step="any" placeholder="0.00" class="w-32 p-2 border border-slate-300 rounded-md focus:ring-orange-500 focus:border-orange-500 quantity-input">
+                        <input type="number" value="${item.AvadaibleStock}" step="any" placeholder="0.00" class="w-32 p-2 border border-slate-300 rounded-md focus:ring-orange-500 focus:border-orange-500 quantity-input">
                     </td>
                     <td class="p-3">
                         <input type="text" placeholder="Comentario..." class="w-full p-2 border border-slate-300 rounded-md focus:ring-orange-500 focus:border-orange-500 comment-input">
@@ -264,7 +264,7 @@
                         return false;
                     }
 
-                    return fetch('insert_inventory.php', {
+                    return fetch('https://grammermx.com/Logistica/QuickInventories/dao/insert_inventory.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(newItemData)
@@ -336,7 +336,7 @@
             }
 
             try {
-                const response = await fetch('update_inventory.php', {
+                const response = await fetch('https://grammermx.com/Logistica/QuickInventories/dao/update_inventory.php', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(itemsToUpdate)
