@@ -51,7 +51,7 @@
                     <span>Carga</span>
                 </a>
                 <a href="#" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0L8 8.25H3.74a1 1 0 00-.98 1.26l.96 4.87a1 1 0 00.98.74H17a1 1 0 00.98-.74l.96-4.87a1 1 0 00-.98-1.26H12l-.51-5.08zM12 15a1 1 0 100 2h-4a1 1 0 100-2h4z" clip-rule="evenodd" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0L8 8.25H3.74a1 1 0 00-.98 1.26l.96 4.87a1 1 0 00.98 .74H17a1 1 0 00.98-.74l.96-4.87a1 1 0 00-.98-1.26H12l-.51-5.08zM12 15a1 1 0 100 2h-4a1 1 0 100-2h4z" clip-rule="evenodd" /></svg>
                     <span>Producción</span>
                 </a>
                 <a href="almacen.html" class="nav-link active flex items-center space-x-2 px-3 py-2 text-sm font-medium">
@@ -299,7 +299,15 @@
                     })
                         .then(response => {
                             if (!response.ok) throw new Error(`Error del Servidor: ${response.statusText}`);
-                            return response.json();
+                            // Important: Check if the response is actually JSON before parsing
+                            const contentType = response.headers.get("content-type");
+                            if (contentType && contentType.indexOf("application/json") !== -1) {
+                                return response.json();
+                            } else {
+                                return response.text().then(text => {
+                                    throw new Error(`Respuesta inesperada del servidor: ${text}`);
+                                });
+                            }
                         })
                         .catch(error => {
                             Swal.showValidationMessage(`La solicitud falló: ${error}`);
@@ -308,13 +316,16 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     const serverResponse = result.value;
-                    if (serverResponse && serverResponse.success && serverResponse.data) {
+                    if (serverResponse && serverResponse.success) {
                         Swal.fire({
-                            title: '¡Éxito!', text: 'Nuevo material agregado a la lista.',
-                            icon: 'success', timer: 2000, showConfirmButton: false
+                            title: '¡Éxito!',
+                            text: serverResponse.message,
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
                         });
-                        resultsArea.classList.remove('hidden');
-                        addItemsToTable([serverResponse.data]);
+                        // Re-search the SUN to get the full data (including the new ID) and add it to the table
+                        searchSun(sunValue);
                     } else {
                         Swal.fire('Error', `No se pudo registrar: ${serverResponse ? serverResponse.message : 'Respuesta inválida.'}`, 'error');
                     }
