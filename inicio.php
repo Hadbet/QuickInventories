@@ -1,335 +1,249 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="favicon.ico">
-    <title>GRAMMER INVENTARIO</title>
-    <link rel="stylesheet" href="css/select2.css">
-    <link rel="stylesheet" href="css/dropzone.css">
-    <link rel="stylesheet" href="css/uppy.min.css">
-    <link rel="stylesheet" href="css/jquery.steps.css">
-    <link rel="stylesheet" href="css/jquery.timepicker.css">
-    <link rel="stylesheet" href="css/quill.snow.css">
-    <?php include 'estaticos/stylesEstandar.php'; ?>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammer Quick Inventor</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PapaParse for CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        .upload-card {
+            @apply bg-white rounded-2xl shadow-lg p-8 text-center transition-all duration-300;
+        }
+        .upload-card:hover {
+            @apply scale-105 shadow-2xl;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        /* Active nav link style */
+        .nav-link.active {
+            @apply bg-orange-600 text-white;
+        }
+    </style>
 </head>
-<body class="vertical  light  ">
-<div class="wrapper">
-    <?php
-            require_once('estaticos/navegador.php');
-    ?>
-    <main role="main" class="main-content">
-        <div class="container-fluid">
-            <div class="row justify-content-center">
-                <div class="col-12">
+<body class="bg-slate-100 font-sans">
 
-                    <div class="row align-items-center mb-2">
-                        <div class="col">
-                            <h2 class="h5 page-title">Bienvenido al sistema de inventario</h2>
-                        </div>
-                        <div class="col-auto">
-                            <form class="form-inline">
-                                <div class="form-group">
-                                    <button type="button" class="btn btn-sm"><span
-                                            class="fe fe-refresh-ccw fe-16 text-muted"></span></button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+<!-- Top Navigation Bar -->
+<nav class="bg-slate-900 text-white shadow-lg fixed top-0 left-0 right-0 z-50">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex justify-between items-center h-20">
+            <!-- Logo/Brand -->
+            <div class="flex-shrink-0">
+                <h1 class="text-2xl font-bold text-orange-400">Grammer Quick Inventor</h1>
+            </div>
 
-                    <div class="mb-2 align-items-center">
-                        <div class="card shadow mb-4">
-                            <div class="card-body">
-                                <div class="row mt-1 align-items-center">
-                                    <div class="col-12 col-lg-4 text-left pl-4">
-                                        <span class="h3">Proceso del inventario</span>
-                                    </div>
-                                </div>
-                                <div class="map-box">
-                                    <div id="areaChartTres"></div>
-                                </div>
-                            </div> <!-- .card-body -->
-                        </div> <!-- .card -->
-                    </div>
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center space-x-2">
+                <a href="#" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-orange-600 hover:text-white">Inicio</a>
+                <a href="#" class="nav-link active px-3 py-2 rounded-md text-sm font-medium">Carga</a>
+                <a href="#" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-orange-600 hover:text-white">Producción</a>
+                <a href="#" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-orange-600 hover:text-white">Almacén</a>
+                <a href="#" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-orange-600 hover:text-white">Location</a>
+                <a href="#" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-orange-600 hover:text-white">Usuarios</a>
+                <a href="#" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-orange-600 hover:text-white">Salir</a>
+            </div>
 
-                    <div class="mb-2 align-items-center">
-                        <div class="card shadow mb-4">
-                            <div class="card-body">
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden flex items-center">
+                <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-700 focus:outline-none">
+                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                        <path id="menu-open-icon" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        <path id="menu-close-icon" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
 
-                                <div class="col-md-2" >
-                                    <div class="form-group mb-3">
-                                        <label for="cbArea">Área</label>
-                                        <select class="custom-select" id="cbArea" onchange="graficaCostoCarga()">
-                                            <option selected value="all">Todas</option>
-                                        </select>
-                                    </div>
-                                </div>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="md:hidden hidden">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            <a href="#" class="block nav-link px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-orange-600 hover:text-white">Inicio</a>
+            <a href="#" class="block nav-link active px-3 py-2 rounded-md text-base font-medium">Carga</a>
+            <a href="#" class="block nav-link px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-orange-600 hover:text-white">Producción</a>
+            <a href="#" class="block nav-link px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-orange-600 hover:text-white">Almacén</a>
+            <a href="#" class="block nav-link px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-orange-600 hover:text-white">Location</a>
+            <a href="#" class="block nav-link px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-orange-600 hover:text-white">Usuarios</a>
+            <a href="#" class="block nav-link px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-orange-600 hover:text-white">Salir</a>
+        </div>
+    </div>
+</nav>
 
-                                <div class="row mt-1 align-items-center">
-                                    <div class="col-12 col-lg-4 text-left pl-4">
-                                        <span class="h3">Proceso del Inventario en dinero</span>
-                                    </div>
-                                </div>
-                                <div class="map-box">
-                                    <div id="areaChartCuatro"></div>
-                                </div>
-                            </div> <!-- .card-body -->
-                        </div> <!-- .card -->
-                    </div>
+<!-- Main Content -->
+<main class="pt-24 p-6 md:p-10">
+    <h2 class="text-3xl font-bold text-slate-700 mb-8">Carga de Datos Masiva</h2>
 
-                </div> <!-- .col-12 -->
-            </div> <!-- .row -->
-        </div> <!-- .container-fluid -->
+    <div id="notification" class="hidden p-4 mb-6 rounded-lg"></div>
 
+    <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
 
-    </main> <!-- main -->
-</div> <!-- .wrapper -->
-<script src="js/jquery.min.js"></script>
-<script src="js/popper.min.js"></script>
-<script src="js/moment.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/simplebar.min.js"></script>
-<script src='js/daterangepicker.js'></script>
-<script src='js/jquery.stickOnScroll.js'></script>
-<script src="js/tinycolor-min.js"></script>
-<script src="js/config.js"></script>
-<script src="js/d3.min.js"></script>
-<script src="js/topojson.min.js"></script>
-<script src="js/datamaps.all.min.js"></script>
-<script src="js/datamaps-zoomto.js"></script>
-<script src="js/datamaps.custom.js"></script>
-<script src="js/Chart.min.js"></script>
-<script>
-    /* defind global options */
-    Chart.defaults.global.defaultFontFamily = base.defaultFontFamily;
-    Chart.defaults.global.defaultFontColor = colors.mutedColor;
-</script>
-<script src="js/gauge.min.js"></script>
-<script src="js/jquery.sparkline.min.js"></script>
-<script src="js/apexcharts.min.js"></script>
-<script src="js/apexcharts.custom.js"></script>
-<script src='js/jquery.mask.min.js'></script>
-<script src='js/select2.min.js'></script>
-<script src='js/jquery.steps.min.js'></script>
-<script src='js/jquery.validate.min.js'></script>
-<script src='js/jquery.timepicker.js'></script>
-<script src='js/dropzone.min.js'></script>
-<script src='js/uppy.min.js'></script>
-<script src='js/quill.min.js'></script>
-<script src="js/apps.js"></script>
+        <!-- Card LX02 -->
+        <div class="upload-card">
+            <label for="lx02-file" class="cursor-pointer group">
+                <svg class="w-24 h-24 mx-auto text-green-600 mb-4 transition-transform duration-300 group-hover:scale-110" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h3 class="text-2xl font-bold text-slate-800 mb-2">Cargar Archivo LX02</h3>
+                <p class="text-gray-500 mb-6">Sube el archivo de stock con descripción de material.</p>
+                <span class="inline-block bg-orange-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-orange-600 transition-colors">Seleccionar Archivo</span>
+                <p id="lx02-filename" class="mt-4 text-sm text-slate-600 truncate"></p>
+            </label>
+            <input type="file" id="lx02-file" accept=".csv, .xlsx, .xls">
+            <button id="process-lx02" class="mt-4 w-full bg-slate-800 text-white font-bold py-3 px-8 rounded-lg hover:bg-slate-900 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed" disabled>
+                Procesar y Cargar
+            </button>
+        </div>
+
+        <!-- Card MM60 -->
+        <div class="upload-card opacity-60">
+            <svg class="w-24 h-24 mx-auto text-green-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3 class="text-2xl font-bold text-slate-800 mb-2">Cargar Archivo MM60</h3>
+            <p class="text-gray-500">Próximamente disponible.</p>
+        </div>
+    </div>
+</main>
 
 <script>
+    // --- State and DOM Elements ---
+    const fileInput = document.getElementById('lx02-file');
+    const filenameDisplay = document.getElementById('lx02-filename');
+    const processButton = document.getElementById('process-lx02');
+    const notification = document.getElementById('notification');
+    let inventoryItems = [];
 
-    document.getElementById("cbArea").addEventListener("change", function(event){
-        event.preventDefault();
-        graficaCostoCarga();
+    // --- Mobile Menu Logic ---
+    const menuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const openIcon = document.getElementById('menu-open-icon');
+    const closeIcon = document.getElementById('menu-close-icon');
+
+    menuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+        openIcon.classList.toggle('hidden');
+        openIcon.classList.toggle('inline-flex');
+        closeIcon.classList.toggle('hidden');
     });
 
-    llenarAreas();
-    function llenarAreas() {
-        $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/consultaArea.php', function (data) {
-            for (var i = 0; i < data.data.length; i++) {
-                var option = $('<option/>');
-                option.attr({ 'value': data.data[i].IdArea }).text(data.data[i].AreaNombre);
-                $('#cbArea').append(option);
-            }
-        });
-    }
-
-    var chartDos;
-    graficaCostoCarga();
-    function graficaCostoCarga() {
-        $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/graficaCosto.php?area='+document.getElementById("cbArea").value, function (data) {
-            var AreaNombreCosto = [];
-            var PrimerConteoCosto = [];
-            var SegundoConteoCosto = [];
-
-            for (var i = 0; i < data.data.length; i++) {
-                var totalContado = data.data[i].TotalContado ? parseFloat(data.data[i].TotalContado).toFixed(2) : '0.00';
-                var totalEsperado = data.data[i].TotalEsperado ? parseFloat(data.data[i].TotalEsperado).toFixed(2) : '0.00';
-                AreaNombreCosto.push((data.data[i].AreaNombre ? data.data[i].AreaNombre : '') + "(" + totalContado + "/" + totalEsperado + ")");
-                PrimerConteoCosto.push(totalContado);
-                SegundoConteoCosto.push(totalEsperado);
-            }
-            graficaCosto(AreaNombreCosto,PrimerConteoCosto,SegundoConteoCosto);
-        });
-    }
-
-    function graficaCosto(AreaNombreCosto,PrimerConteoCosto,SegundoConteoCosto) {
-        var options = {
-            series: [{
-                name: 'Monto actual',
-                type: 'column',
-                data: PrimerConteoCosto
-            }, {
-                name: 'Monto Estimado',
-                type: 'column',
-                data: SegundoConteoCosto
-            }],
-            chart: {
-                height: 700,
-                stacked: false,
-            },
-            stroke: {
-                width: [0, 2, 5],
-                curve: 'smooth'
-            },
-            plotOptions: {
-                bar: {
-                    columnWidth: '50%'
-                }
-            },
-            fill: {
-                opacity: [0.85, 0.85, 1],
-                gradient: {
-                    inverseColors: false,
-                    shade: 'light',
-                    type: "vertical",
-                    opacityFrom: 0.85,
-                    opacityTo: 0.55,
-                    stops: [0, 100, 100, 100]
-                }
-            },
-            labels: AreaNombreCosto,
-            markers: {
-                size: 0
-            },
-            xaxis: {
-                type: 'category'
-            },
-            yaxis: {
-                title: {
-                    text: 'Proceso',
-                }
-            },
-            tooltip: {
-                shared: true,
-                intersect: false,
-                y: {
-                    formatter: function (y) {
-                        if (typeof y !== "undefined") {
-                            return  "$ "+y.toFixed(2);
-                        }
-                        return y;
-                    }
-                }
-            }
-        };
-
-        if(chartDos) {
-            chartDos.destroy(); // Destruye el gráfico anterior si existe
+    // --- File Handling Logic (Simplified, AI removed) ---
+    fileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) {
+            resetFileState();
+            return;
         }
 
-        chartDos = new ApexCharts(document.querySelector("#areaChartCuatro"), options);
-        chartDos.render();
-    }
+        filenameDisplay.textContent = file.name;
+        showNotification('Archivo listo para procesar.', 'blue');
 
-
-
-
-    var chart;
-
-    Apu();
-    setInterval(Apu, 60000); // Actualiza cada minuto
-    function Apu() {
-        $.getJSON('https://grammermx.com/Logistica/QuickInventories/dao/graficaGeneral.php', function (data) {
-            var AreaNombre = [];
-            var PrimerConteo = [];
-            var SegundoConteo = [];
-            var Estandar = [];
-
-            for (var i = 0; i < data.data.length; i++) {
-                AreaNombre.push((data.data[i].AreaNombre ? data.data[i].AreaNombre : '')+"("+data.data[i].PrimerConteoLiberado+"/"+data.data[i].TotalPrimerConteo+")");
-                PrimerConteo.push(data.data[i].PorcentajePrimerConteo ? parseFloat(data.data[i].PorcentajePrimerConteo) : 0);
-                SegundoConteo.push(data.data[i].PorcentajeSegundoConteo ? parseFloat(data.data[i].PorcentajeSegundoConteo) : 0);
-                Estandar.push(100.00);
-            }
-
-            console.log(AreaNombre);
-            console.log(PrimerConteo);
-            console.log(SegundoConteo);
-            graficaAusentismosApu(AreaNombre,PrimerConteo,SegundoConteo,Estandar);
+        Papa.parse(file, {
+            delimiter: "\t",
+            complete: (results) => handleParsingComplete(results),
+            error: (err) => handleParsingError(err)
         });
-    }
+    });
 
-    function graficaAusentismosApu(AreaNombre,PrimerConteo,SegundoConteo,Estandar) {
-        var options = {
-            series: [{
-                name: 'Primer Conteo',
-                type: 'column',
-                data: PrimerConteo
-            }, {
-                name: 'Segundo Conteo',
-                type: 'column',
-                data: SegundoConteo
-            }, {
-                name: 'Estandar',
-                type: 'line',
-                data: Estandar
-            }],
-            chart: {
-                height: 750,
-                type: 'line',
-                stacked: false,
-            },
-            stroke: {
-                width: [0, 2, 5],
-                curve: 'smooth'
-            },
-            plotOptions: {
-                bar: {
-                    columnWidth: '50%'
-                }
-            },
-            fill: {
-                opacity: [0.85, 0.25, 1],
-                gradient: {
-                    inverseColors: false,
-                    shade: 'light',
-                    type: "vertical",
-                    opacityFrom: 0.85,
-                    opacityTo: 0.55,
-                    stops: [0, 100, 100, 100]
-                }
-            },
-            labels: AreaNombre,
-            markers: {
-                size: 0
-            },
-            xaxis: {
-                type: 'category'
-            },
-            yaxis: {
-                title: {
-                    text: 'Proceso',
-                }
-            },
-            tooltip: {
-                shared: true,
-                intersect: false,
-                y: {
-                    formatter: function (y) {
-                        if (typeof y !== "undefined") {
-                            return y.toFixed(0) + " %";
-                        }
-                        return y;
-                    }
-                }
-            }
-        };
+    function handleParsingComplete(results) {
+        const data = results.data;
+        const dataStartIndex = 6;
 
-        if(chart) {
-            chart.destroy(); // Destruye el gráfico anterior si existe
+        if (data.length < dataStartIndex) {
+            showNotification('El archivo no tiene el formato esperado o está vacío.', 'red');
+            resetFileState();
+            return;
         }
 
-        chart = new ApexCharts(document.querySelector("#areaChartTres"), options);
-        chart.render();
+        inventoryItems = data.slice(dataStartIndex).map(row => {
+            if (row.length < 11 || !row[0]) return null;
+            return {
+                Material: row[0]?.trim(),
+                Plant: row[1]?.trim(),
+                StorageLocation: row[2]?.trim(),
+                Description: row[3]?.trim(),
+                StorageType: row[4]?.trim(),
+                StorageBin: row[6]?.trim(),
+                AvadaibleStock: parseFloat(row[7]?.trim().replace(',', '') || 0),
+                UnidadMedida: row[8]?.trim(),
+                Sun: row[10]?.trim() || '',
+                CantidadContada: 0,
+                UsuarioContador: 'Carga Masiva LX02',
+                Comentario: '',
+                Tipo: 'LX02'
+            };
+        }).filter(item => item !== null);
+
+        if (inventoryItems.length > 0) {
+            showNotification(`Se encontraron ${inventoryItems.length} registros válidos. Listo para procesar.`, 'green');
+            processButton.disabled = false;
+        } else {
+            showNotification('No se encontraron datos válidos en el archivo.', 'orange');
+            resetFileState();
+        }
     }
 
+    function handleParsingError(err) {
+        showNotification('Error al leer el archivo: ' + err, 'red');
+        resetFileState();
+    }
 
+    function resetFileState() {
+        fileInput.value = '';
+        filenameDisplay.textContent = '';
+        processButton.disabled = true;
+        inventoryItems = [];
+    }
+
+    // --- Button Actions ---
+    processButton.addEventListener('click', () => {
+        if (inventoryItems.length === 0) {
+            showNotification('No hay datos para procesar.', 'red');
+            return;
+        }
+        processButton.disabled = true;
+        processButton.textContent = 'Enviando...';
+        sendDataToBackend(inventoryItems);
+    });
+
+    async function sendDataToBackend(data) {
+        try {
+            const response = await fetch('dao/cargaBaseDatos.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) throw new Error(`Error del servidor: ${response.statusText}`);
+            const result = await response.json();
+
+            if (result.success) {
+                showNotification(result.message, 'green');
+                resetFileState();
+            } else {
+                showNotification('Error al guardar: ' + result.message, 'red');
+            }
+        } catch (error) {
+            showNotification('Error de conexión: ' + error.message, 'red');
+        } finally {
+            processButton.disabled = false;
+            processButton.textContent = 'Procesar y Cargar';
+        }
+    }
+
+    // --- UI Notifications ---
+    function showNotification(message, color) {
+        notification.textContent = message;
+        notification.className = `p-4 mb-6 rounded-lg text-white font-semibold transition-opacity duration-300`;
+        const colorClasses = {
+            green: 'bg-green-500', red: 'bg-red-500',
+            blue: 'bg-blue-500', orange: 'bg-orange-500'
+        };
+        notification.classList.add(colorClasses[color] || 'bg-gray-500');
+        notification.classList.remove('hidden');
+    }
 </script>
-
 </body>
 </html>
+
