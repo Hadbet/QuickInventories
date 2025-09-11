@@ -228,7 +228,7 @@
     // --- Backend Communication ---
     async function sendDataToBackend(data) {
         try {
-            const response = await fetch('upload_lx02.php', {
+            const response = await fetch('https://grammermx.com/Logistica/QuickInventories/dao/cargaBaseDatos.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
