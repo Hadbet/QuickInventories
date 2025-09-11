@@ -1,7 +1,7 @@
 <?php
 
 header('Content-Type: application/json');
-include_once('db/db_Machinery.php');
+include_once('db/db_Inventario.php');
 
 $json_data = file_get_contents('php://input');
 $data = json_decode($json_data, true);
