@@ -17,7 +17,7 @@ try {
     $conex = $con->conectar();
 
     // Consulta para buscar el SUN
-    $stmt = $conex->prepare("SELECT `IdInventario`, `Material`, `Description`, `StorageType`, `StorageBin`, `AvadaibleStock`, `UnidadMedida`, `Sun` FROM `Inventario` WHERE `Sun` = ?");
+    $stmt = $conex->prepare("SELECT `IdInventario`, `Material`, `Description`, `StorageType`, `StorageBin`, `AvadaibleStock`, `UnidadMedida`, `Sun`, `Estado` FROM `Inventario` WHERE `Sun` = ?");
     $stmt->bind_param("s", $sun);
     $stmt->execute();
     $result = $stmt->get_result();
