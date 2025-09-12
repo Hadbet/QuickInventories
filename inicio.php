@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- XLSX for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         .nav-link.active {
             @apply bg-white/20 rounded-md;
@@ -75,7 +77,20 @@
 
     <!-- Analysis Table -->
     <div class="bg-white p-6 rounded-2xl shadow-lg">
-        <h3 class="text-2xl font-bold text-slate-800 mb-4">Análisis de Inventario</h3>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+            <h3 class="flex items-center text-2xl font-bold text-slate-800 mb-4 sm:mb-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mr-3 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                Análisis de Inventario
+            </h3>
+            <button id="download-excel-btn" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+                <span>Descargar Excel</span>
+            </button>
+        </div>
         <div id="analysis-table-container" class="table-container overflow-auto"></div>
     </div>
 </main>
@@ -89,6 +104,8 @@
         if (menuButton) {
             menuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
         }
+
+        let analysisDataForExport = []; // Variable to store data for Excel export
 
         const createTable = (headers, data, containerId) => {
             const container = document.getElementById(containerId);
@@ -128,6 +145,7 @@
 
                 if (result.success) {
                     const allData = result.data;
+                    analysisDataForExport = allData; // Store data for export
 
                     // Filter data for status tables
                     const pending = allData.filter(item => item.Estado == '0');
@@ -135,36 +153,24 @@
                     const newSystem = allData.filter(item => item.Estado == '2');
 
                     // Define headers for each table
-                    const capturedHeaders = [
-                        { label: 'Material', key: 'Material' }, { label: 'Descripción', key: 'Description' }, { label: 'Cant. Contada', key: 'CantidadContada' }, { label: 'UM', key: 'UnidadMedida' }, { label: 'Contador', key: 'UsuarioContador' }, { label: 'Comentario', key: 'Comentario' }
-                    ];
-                    const pendingHeaders = [
-                        { label: 'Material', key: 'Material' }, { label: 'Descripción', key: 'Description' }, { label: 'Stock Sistema', key: 'AvadaibleStock' }, { label: 'UM', key: 'UnidadMedida' }, { label: 'Ubicación', key: 'StorageBin' }
-                    ];
-                    const newSystemHeaders = [
-                        { label: 'Material', key: 'Material' }, { label: 'Descripción', key: 'Description' }, { label: 'Cant. Contada', key: 'CantidadContada' }, { label: 'UM', key: 'UnidadMedida' }, { label: 'Contador', key: 'UsuarioContador' }, { label: 'Ubicación', key: 'StorageBin' }
-                    ];
+                    const capturedHeaders = [ { label: 'Material', key: 'Material' }, { label: 'Descripción', key: 'Description' }, { label: 'Cant. Contada', key: 'CantidadContada' }, { label: 'UM', key: 'UnidadMedida' }, { label: 'Contador', key: 'UsuarioContador' }, { label: 'Comentario', key: 'Comentario' } ];
+                    const pendingHeaders = [ { label: 'Material', key: 'Material' }, { label: 'Descripción', key: 'Description' }, { label: 'Stock Sistema', key: 'AvadaibleStock' }, { label: 'UM', key: 'UnidadMedida' }, { label: 'Ubicación', key: 'StorageBin' } ];
+                    const newSystemHeaders = [ { label: 'Material', key: 'Material' }, { label: 'Descripción', key: 'Description' }, { label: 'Cant. Contada', key: 'CantidadContada' }, { label: 'UM', key: 'UnidadMedida' }, { label: 'Contador', key: 'UsuarioContador' }, { label: 'Ubicación', key: 'StorageBin' } ];
+
                     const analysisHeaders = [
-                        { label: 'Material', key: 'Material' }, { label: 'Descripción', key: 'Description' }, { label: 'Ubicación', key: 'StorageBin' }, { label: 'Stock Sistema', key: 'AvadaibleStock' }, { label: 'Cant. Contada', key: 'CantidadContada' }, { label: 'UM', key: 'UnidadMedida' },
+                        { label: 'Material', key: 'Material' }, { label: 'Descripción', key: 'Description' }, { label: 'Ubicación', key: 'StorageBin' }, { label: 'SUN', key: 'Sun' }, { label: 'Stock Sistema', key: 'AvadaibleStock' }, { label: 'Cant. Contada', key: 'CantidadContada' }, { label: 'UM', key: 'UnidadMedida' },
                         {
-                            label: 'Cumplimiento',
-                            key: 'Cumplimiento',
+                            label: 'Cumplimiento', key: 'Cumplimiento',
                             format: (row) => {
-                                const available = parseFloat(row.AvadaibleStock);
-                                const counted = parseFloat(row.CantidadContada);
+                                const available = parseFloat(row.AvadaibleStock); const counted = parseFloat(row.CantidadContada);
                                 if (isNaN(available) || isNaN(counted)) return '<span class="text-slate-400">N/A</span>';
-                                if (available > 0) {
-                                    const percentage = (counted / available) * 100;
-                                    const color = percentage < 95 ? 'text-red-500' : (percentage > 105 ? 'text-blue-500' : 'text-green-500');
-                                    return `<span class="font-bold ${color}">${percentage.toFixed(1)}%</span>`;
-                                }
+                                if (available > 0) { const percentage = (counted / available) * 100; const color = percentage < 95 ? 'text-red-500' : (percentage > 105 ? 'text-blue-500' : 'text-green-500'); return `<span class="font-bold ${color}">${percentage.toFixed(1)}%</span>`; }
                                 if (available === 0 && counted === 0) return '<span class="font-bold text-green-500">100%</span>';
                                 return '<span class="font-bold text-sky-500">Extra</span>';
                             }
                         },
                         {
-                            label: 'Costo Total Contado',
-                            key: 'CostoTotalContado',
+                            label: 'Costo Total Contado', key: 'CostoTotalContado',
                             format: (row) => {
                                 const cost = parseFloat(row.CostoTotalContado);
                                 if (isNaN(cost)) return '<span class="text-slate-400">N/A</span>';
@@ -180,9 +186,7 @@
                     createTable(newSystemHeaders, newSystem, 'new-system-table-container');
                     createTable(analysisHeaders, allData, 'analysis-table-container');
 
-                } else {
-                    throw new Error(result.message);
-                }
+                } else { throw new Error(result.message); }
             } catch (error) {
                 console.error('Error loading inventory data:', error);
                 const containers = ['pending-table-container', 'captured-table-container', 'new-system-table-container', 'analysis-table-container'];
@@ -193,8 +197,38 @@
             }
         };
 
+        const downloadBtn = document.getElementById('download-excel-btn');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', () => {
+                if (analysisDataForExport.length === 0) {
+                    Swal.fire('Atención', 'No hay datos para exportar.', 'warning');
+                    return;
+                }
+                const exportData = analysisDataForExport.map(row => {
+                    const available = parseFloat(row.AvadaibleStock); const counted = parseFloat(row.CantidadContada);
+                    let compliance = 'N/A';
+                    if (!isNaN(available) && !isNaN(counted)) {
+                        if (available > 0) { compliance = `${((counted / available) * 100).toFixed(1)}%`; }
+                        else if (available === 0 && counted === 0) { compliance = '100%'; }
+                        else { compliance = 'Extra'; }
+                    }
+                    const totalCost = parseFloat(row.CostoTotalContado);
+                    return {
+                        'Material': row.Material, 'Descripción': row.Description, 'Ubicación': row.StorageBin, 'SUN': row.Sun, 'Stock Sistema': available, 'Cant. Contada': counted, 'UM': row.UnidadMedida, 'Cumplimiento': compliance, 'Costo Total Contado (MXN)': !isNaN(totalCost) ? totalCost : 'N/A', 'Contador': row.UsuarioContador, 'Comentario': row.Comentario,
+                    };
+                });
+                const worksheet = XLSX.utils.json_to_sheet(exportData);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Análisis de Inventario");
+                const cols = Object.keys(exportData[0] || {});
+                const colWidths = cols.map(key => ({ wch: Math.max(key.length, ...exportData.map(row => String(row[key] ?? '').length)) + 2 }));
+                worksheet['!cols'] = colWidths;
+                XLSX.writeFile(workbook, "Analisis_Inventario.xlsx");
+            });
+        }
         loadInventoryData();
     });
 </script>
 </body>
 </html>
+
