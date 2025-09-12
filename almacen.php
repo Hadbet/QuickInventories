@@ -230,7 +230,7 @@
                     <td class="p-3">${item.Material}</td>
                     <td class="p-3">${item.Description}</td>
                     <td class="p-3">${stock} ${item.UnidadMedida}</td>
-                    <td class="p-3">
+                    <td class="p-3 quantity-cell">
                         <input type="number" value="${stock}" step="any" placeholder="0.00" class="w-32 p-2 border border-slate-300 rounded-md focus:ring-orange-500 focus:border-orange-500 quantity-input" disabled>
                     </td>
                     <td class="p-3">
@@ -249,9 +249,7 @@
             });
         }
 
-        // --- **CAMBIO CLAVE: Listener combinado para borrado y desbloqueo de input** ---
         resultsTbody.addEventListener('click', (e) => {
-            // Lógica para el botón de borrar
             const deleteButton = e.target.closest('.delete-btn');
             if (deleteButton) {
                 const row = deleteButton.closest('tr');
@@ -264,29 +262,36 @@
                 if (resultsTbody.rows.length === 0) {
                     resultsArea.classList.add('hidden');
                 }
-                return; // Detener para no activar la lógica del input
+                return;
             }
 
-            // Lógica para desbloquear el input de cantidad
-            const quantityInput = e.target;
-            if (quantityInput.classList.contains('quantity-input') && quantityInput.disabled) {
-                Swal.fire({
-                    title: '¿Modificar Cantidad?',
-                    text: "Solo aplica cuando es una caja abierta. ¿Deseas editar la cantidad?",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ea580c',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Sí, editar',
-                    cancelButtonText: 'No'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        quantityInput.disabled = false;
-                        quantityInput.focus();
-                        quantityInput.select(); // Selecciona el texto para sobreescribir fácilmente
-                    }
-                });
+            // <-- **INICIO DE LA CORRECCIÓN** -->
+            // 1. Buscamos la CELDA que contiene el input
+            const quantityCell = e.target.closest('.quantity-cell');
+            if (quantityCell) {
+                // 2. Dentro de esa celda, buscamos el input deshabilitado
+                const quantityInput = quantityCell.querySelector('.quantity-input:disabled');
+                // 3. Si lo encontramos, mostramos la alerta
+                if (quantityInput) {
+                    Swal.fire({
+                        title: '¿Modificar Cantidad?',
+                        text: "Solo aplica cuando es una caja abierta. ¿Deseas editar la cantidad?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ea580c',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Sí, editar',
+                        cancelButtonText: 'No'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            quantityInput.disabled = false;
+                            quantityInput.focus();
+                            quantityInput.select();
+                        }
+                    });
+                }
             }
+            // <-- **FIN DE LA CORRECCIÓN** -->
         });
 
         function showNewItemModal(sunValue) {
