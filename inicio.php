@@ -3,26 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Almacén - Grammer Quick Inventor</title>
+    <title>Inicio - Grammer Quick Inventor</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- XLSX for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        /* Active nav link style */
         .nav-link.active {
             @apply bg-white/20 rounded-md;
         }
-        .swal2-popup {
-            font-family: 'font-sans';
+        /* Custom scrollbar for tables */
+        .table-container::-webkit-scrollbar {
+            height: 8px;
         }
-        .swal2-input {
-            border-radius: 0.375rem !important; /* Tailwind's rounded-md */
-            border: 1px solid #d1d5db !important; /* Tailwind's border-slate-300 */
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f5f9; /* slate-100 */
         }
-        .swal2-input:focus {
-            box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.3) !important; /* Ring for focus */
-            border-color: #ea580c !important; /* Tailwind's border-orange-500 */
+        .table-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1; /* slate-300 */
+            border-radius: 4px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; /* slate-400 */
         }
     </style>
 </head>
@@ -32,352 +36,199 @@
 <nav class="bg-gradient-to-r from-orange-600 to-orange-800 text-white shadow-xl fixed top-0 left-0 right-0 z-50">
     <div class="max-w-7xl mx-auto px-4">
         <div class="flex justify-between items-center h-20">
-            <!-- Logo/Brand -->
             <div class="flex-shrink-0 flex items-center space-x-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
                 <h1 class="text-2xl font-bold text-white">Grammer Quick Inventor</h1>
             </div>
-
-            <!-- Desktop Menu -->
             <div class="hidden md:flex items-center space-x-2">
-                <a href="inicio.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
-                    <span>Inicio</span>
-                </a>
-                <a href="carga.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
-                    <span>Carga</span>
-                </a>
-                <a href="produccion.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0L8 8.25H3.74a1 1 0 00-.98 1.26l.96 4.87a1 1 0 00.98 .74H17a1 1 0 00.98-.74l.96-4.87a1 1 0 00-.98-1.26H12l-.51-5.08zM12 15a1 1 0 100 2h-4a1 1 0 100-2h4z" clip-rule="evenodd" /></svg>
-                    <span>Producción</span>
-                </a>
-                <a href="almacen.php" class="nav-link active flex items-center space-x-2 px-3 py-2 text-sm font-medium">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6z" /></svg>
-                    <span>Almacén</span>
-                </a>
-                <a href="#" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
-                    <span>Location</span>
-                </a>
-                <a href="#" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" /></svg>
-                    <span>Usuarios</span>
-                </a>
-                <a href="#" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" /></svg>
-                    <span>Salir</span>
-                </a>
+                <a href="inicio.html" class="nav-link active flex items-center space-x-2 px-3 py-2 text-sm font-medium"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg><span>Inicio</span></a>
+                <a href="carga.html" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg><span>Carga</span></a>
+                <a href="produccion.html" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0L8 8.25H3.74a1 1 0 00-.98 1.26l.96 4.87a1 1 0 00.98 .74H17a1 1 0 00.98-.74l.96-4.87a1 1 0 00-.98-1.26H12l-.51-5.08zM12 15a1 1 0 100 2h-4a1 1 0 100-2h4z" clip-rule="evenodd" /></svg><span>Producción</span></a>
+                <a href="almacen.html" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6z" /></svg><span>Almacén</span></a>
+                <a href="#" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg><span>Location</span></a>
+                <a href="#" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" /></svg><span>Usuarios</span></a>
+                <a href="#" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" /></svg><span>Salir</span></a>
             </div>
-            <!-- Mobile Menu Button -->
-            <div class="md:hidden flex items-center">
-                <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-white/20 focus:outline-none">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path id="menu-open-icon" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /><path id="menu-close-icon" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
+            <div class="md:hidden flex items-center"><button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-white/20 focus:outline-none"><svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path id="menu-open-icon" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /><path id="menu-close-icon" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button></div>
         </div>
     </div>
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="md:hidden hidden">
-        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <a href="inicio.php" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Inicio</span></a>
-            <a href="carga.php" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Carga</span></a>
-            <a href="produccion.php" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Producción</span></a>
-            <a href="almacen.php" class="block nav-link active flex items-center space-x-2 px-3 py-2 text-base font-medium"><span>Almacén</span></a>
-            <a href="#" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Location</span></a>
-            <a href="#" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Usuarios</span></a>
-            <a href="#" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Salir</span></a>
-        </div>
-    </div>
+    <div id="mobile-menu" class="md:hidden hidden"><div class="px-2 pt-2 pb-3 space-y-1 sm:px-3"></div></div>
 </nav>
 
-<main>
-    <!-- Banner Section -->
-    <div class="relative h-64 md:h-80 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1586528116311-06924112d76a?q=80&w=2070&auto=format&fit=crop');">
-        <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
-            <h2 class="text-4xl md:text-6xl font-extrabold text-white tracking-wider text-center px-4">
-                Captura de SUN
-            </h2>
+<main class="pt-24 pb-10 px-4 md:px-10">
+    <!-- Status Tables -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+        <!-- Pendientes -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <h3 class="flex items-center text-xl font-bold text-slate-800 mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Pendientes</h3>
+            <div id="pending-table-container" class="table-container max-h-80 overflow-auto"></div>
+        </div>
+        <!-- Capturados -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <h3 class="flex items-center text-xl font-bold text-slate-800 mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Capturados</h3>
+            <div id="captured-table-container" class="table-container max-h-80 overflow-auto"></div>
+        </div>
+        <!-- Fuera de Sistema -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <h3 class="flex items-center text-xl font-bold text-slate-800 mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Fuera de Sistema</h3>
+            <div id="new-system-table-container" class="table-container max-h-80 overflow-auto"></div>
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="pt-10 p-6 md:p-10">
-        <div class="max-w-4xl mx-auto">
-            <h2 class="text-2xl font-bold text-slate-700 mb-4 text-center">Escanea o introduce un SUN</h2>
-            <div class="relative">
-                <input type="text" id="sun-input" placeholder="Introduce el código SUN y presiona Enter..." class="w-full p-4 pr-12 text-lg border-2 border-slate-300 rounded-full shadow-sm focus:ring-orange-500 focus:border-orange-500 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            </div>
+    <!-- Analysis Table -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+            <h3 class="flex items-center text-2xl font-bold text-slate-800 mb-4 sm:mb-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mr-3 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                Análisis de Inventario
+            </h3>
+            <button id="download-excel-btn" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+                <span>Descargar Excel</span>
+            </button>
         </div>
-
-        <div id="notification-area" class="max-w-4xl mx-auto mt-6"></div>
-
-        <!-- Results Area -->
-        <div id="results-area" class="mt-8 max-w-7xl mx-auto hidden">
-            <div class="bg-white p-6 rounded-2xl shadow-lg overflow-x-auto">
-                <h3 class="text-2xl font-bold text-slate-800 mb-4">Materiales a Contar</h3>
-                <table class="w-full text-left">
-                    <thead>
-                    <tr class="border-b-2 border-slate-200">
-                        <th class="p-3">Material</th>
-                        <th class="p-3">Descripción</th>
-                        <th class="p-3">Stock Actual</th>
-                        <th class="p-3">Cantidad Contada</th>
-                        <th class="p-3">Comentarios</th>
-                        <th class="p-3">SUN</th>
-                        <th class="p-3 text-center">Acción</th>
-                    </tr>
-                    </thead>
-                    <tbody id="results-tbody">
-                    <!-- Rows will be inserted here by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-            <div class="mt-6 text-center">
-                <button id="capture-button" class="bg-slate-800 text-white font-bold py-3 px-12 rounded-lg hover:bg-slate-900 transition-colors text-lg">
-                    Capturar Conteo
-                </button>
-            </div>
-        </div>
+        <div id="analysis-table-container" class="table-container overflow-auto"></div>
     </div>
 </main>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const sunInput = document.getElementById('sun-input');
-        const resultsArea = document.getElementById('results-area');
-        const resultsTbody = document.getElementById('results-tbody');
-        const notificationArea = document.getElementById('notification-area');
-        const captureButton = document.getElementById('capture-button');
+
+        // Mobile menu logic
         const menuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
-        const openIcon = document.getElementById('menu-open-icon');
-        const closeIcon = document.getElementById('menu-close-icon');
+        if (menuButton) {
+            menuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+        }
 
-        let scannedItems = new Set();
+        let analysisDataForExport = []; // Variable to store data for Excel export
 
-        menuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-            openIcon.classList.toggle('hidden');
-            openIcon.classList.toggle('inline-flex');
-            closeIcon.classList.toggle('hidden');
-        });
+        const createTable = (headers, data, containerId) => {
+            const container = document.getElementById(containerId);
+            if (!container) return;
 
-        sunInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && sunInput.value.trim() !== '') {
-                e.preventDefault();
-                searchSun(sunInput.value.trim());
-            }
-        });
-
-        async function searchSun(sunValue) {
-            if (scannedItems.has(sunValue)) {
-                showNotification(`El SUN ${sunValue} ya ha sido agregado a la lista actual.`, 'orange');
-                sunInput.value = '';
-                sunInput.focus();
+            if (data.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-slate-500">No hay datos para mostrar.</div>`;
                 return;
             }
 
+            let tableHtml = '<table class="w-full text-left text-sm">';
+            tableHtml += '<thead><tr class="border-b-2 border-slate-200">';
+            headers.forEach(h => tableHtml += `<th class="p-3 font-semibold text-slate-600">${h.label}</th>`);
+            tableHtml += '</tr></thead><tbody>';
+
+            data.forEach(row => {
+                tableHtml += '<tr class="border-b border-slate-100 hover:bg-slate-50">';
+                headers.forEach(h => {
+                    let value = row[h.key] ?? 'N/A';
+                    if (h.format) {
+                        value = h.format(row);
+                    }
+                    tableHtml += `<td class="p-3 text-slate-700">${value}</td>`;
+                });
+                tableHtml += '</tr>';
+            });
+
+            tableHtml += '</tbody></table>';
+            container.innerHTML = tableHtml;
+        };
+
+        const loadInventoryData = async () => {
             try {
-                const response = await fetch(`https://grammermx.com/Logistica/QuickInventories/dao/search_sun.php?sun=${encodeURIComponent(sunValue)}`);
+                const response = await fetch('https://grammermx.com/Logistica/QuickInventories/dao/get_inventory_summary.php');
                 if (!response.ok) throw new Error('Network response was not ok.');
                 const result = await response.json();
 
-                if (result.success && result.data.length > 0) {
-                    const firstItem = result.data[0];
-
-                    // <-- **CAMBIO CLAVE: Validar si el estado es 1 (capturado)** -->
-                    if (firstItem.Estado == '1') {
-                        showNotification(`El SUN ${sunValue} ya fue capturado y no se puede contar de nuevo.`, 'orange');
-                        sunInput.value = '';
-                        sunInput.focus();
-                        return; // Detiene la ejecución para no agregarlo a la tabla
-                    }
-
-                    resultsArea.classList.remove('hidden');
-                    addItemsToTable(result.data);
-                    showNotification(`SUN ${sunValue} encontrado y agregado a la lista.`, 'green');
-
-                } else {
-                    showNewItemModal(sunValue);
-                }
-                sunInput.value = '';
-                sunInput.focus();
-
-            } catch (error) {
-                showNotification(`Error de conexión: ${error.message}`, 'red');
-            }
-        }
-
-        function addItemsToTable(items) {
-            items.forEach(item => {
-                if (!item || !item.Sun || scannedItems.has(item.Sun)) return;
-
-                scannedItems.add(item.Sun);
-                const row = document.createElement('tr');
-                row.className = 'border-b border-slate-200 hover:bg-slate-50';
-                row.dataset.id = item.IdInventario;
-                row.dataset.originalEstado = item.Estado;
-
-                const stock = parseFloat(String(item.AvadaibleStock).replace(/,/g, '')) || 0;
-
-                row.innerHTML = `
-                    <td class="p-3">${item.Material}</td>
-                    <td class="p-3">${item.Description}</td>
-                    <td class="p-3">${stock} ${item.UnidadMedida}</td>
-                    <td class="p-3">
-                        <input type="number" value="${stock}" step="any" placeholder="0.00" class="w-32 p-2 border border-slate-300 rounded-md focus:ring-orange-500 focus:border-orange-500 quantity-input">
-                    </td>
-                    <td class="p-3">
-                        <input type="text" placeholder="Comentario..." class="w-full p-2 border border-slate-300 rounded-md focus:ring-orange-500 focus:border-orange-500 comment-input">
-                    </td>
-                    <td class="p-3 font-mono">${item.Sun}</td>
-                    <td class="p-3 text-center">
-                        <button class="text-red-500 hover:text-red-700 delete-btn" title="Eliminar fila">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
-                    </td>
-                `;
-                resultsTbody.appendChild(row);
-            });
-        }
-
-        resultsTbody.addEventListener('click', (e) => {
-            const deleteButton = e.target.closest('.delete-btn');
-            if (deleteButton) {
-                const row = deleteButton.closest('tr');
-                const sunCell = row.cells[5];
-                if(sunCell) {
-                    const sunToRemove = sunCell.textContent;
-                    scannedItems.delete(sunToRemove);
-                }
-                row.remove();
-                if (resultsTbody.rows.length === 0) {
-                    resultsArea.classList.add('hidden');
-                }
-            }
-        });
-
-        function showNewItemModal(sunValue) {
-            Swal.fire({
-                title: 'Registrar Nuevo Material',
-                html: `
-                    <div class="text-left space-y-4 p-4">
-                        <div><label for="modal-material" class="block font-medium text-slate-700 mb-1">Número de Parte (Material) *</label><input type="text" id="modal-material" class="swal2-input w-full"></div>
-                        <div><label for="modal-description" class="block font-medium text-slate-700 mb-1">Descripción *</label><input type="text" id="modal-description" class="swal2-input w-full"></div>
-                        <div><label for="modal-storagetype" class="block font-medium text-slate-700 mb-1">Storage Type</label><input type="text" id="modal-storagetype" class="swal2-input w-full"></div>
-                        <div><label for="modal-storagebin" class="block font-medium text-slate-700 mb-1">Storage Bin</label><input type="text" id="modal-storagebin" class="swal2-input w-full"></div>
-                        <div class="flex space-x-4">
-                            <div class="flex-1"><label for="modal-quantity" class="block font-medium text-slate-700 mb-1">Cantidad Contada *</label><input type="number" step="any" id="modal-quantity" class="swal2-input w-full"></div>
-                            <div class="flex-1"><label for="modal-unit" class="block font-medium text-slate-700 mb-1">Unidad de Medida *</label><input type="text" id="modal-unit" class="swal2-input w-full"></div>
-                        </div>
-                    </div>
-                `,
-                confirmButtonText: 'Registrar y Agregar',
-                confirmButtonColor: '#ea580c',
-                showCancelButton: true,
-                cancelButtonText: 'Cancelar',
-                focusConfirm: false,
-                width: '48rem',
-                didOpen: () => { document.getElementById('modal-material').focus(); },
-                preConfirm: () => {
-                    const newItemData = {
-                        Sun: sunValue, Material: document.getElementById('modal-material').value, Description: document.getElementById('modal-description').value, StorageType: document.getElementById('modal-storagetype').value, StorageBin: document.getElementById('modal-storagebin').value, CantidadContada: document.getElementById('modal-quantity').value, UnidadMedida: document.getElementById('modal-unit').value,
-                    };
-
-                    if (!newItemData.Material || !newItemData.Description || !newItemData.CantidadContada || !newItemData.UnidadMedida) {
-                        Swal.showValidationMessage(`Por favor, complete todos los campos requeridos (*).`);
-                        return false;
-                    }
-
-                    Swal.showLoading();
-                    return fetch('https://grammermx.com/Logistica/QuickInventories/dao/insert_inventory.php', {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newItemData)
-                    })
-                        .then(response => {
-                            if (!response.ok) throw new Error(`Error del Servidor: ${response.statusText}`);
-                            const contentType = response.headers.get("content-type");
-                            if (contentType && contentType.includes("application/json")) { return response.json(); }
-                            else { return response.text().then(text => { throw new Error(`Respuesta inesperada: ${text}`); }); }
-                        })
-                        .catch(error => { Swal.showValidationMessage(`La solicitud falló: ${error}`); });
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const serverResponse = result.value;
-                    if (serverResponse && serverResponse.success) {
-                        Swal.fire({ title: '¡Éxito!', text: serverResponse.message, icon: 'success', timer: 1500, showConfirmButton: false });
-                        searchSun(sunValue);
-                    } else {
-                        Swal.fire('Error', `No se pudo registrar: ${serverResponse ? serverResponse.message : 'Respuesta inválida.'}`, 'error');
-                    }
-                }
-            });
-        }
-
-        captureButton.addEventListener('click', async () => {
-            const itemsToUpdate = [];
-            const rows = resultsTbody.querySelectorAll('tr');
-            let hasEmptyQuantities = false;
-
-            rows.forEach(row => {
-                const quantityInput = row.querySelector('.quantity-input');
-                if (quantityInput.value === '' || quantityInput.value === null) {
-                    hasEmptyQuantities = true;
-                }
-                itemsToUpdate.push({
-                    IdInventario: row.dataset.id,
-                    CantidadContada: quantityInput.value || 0,
-                    Comentario: row.querySelector('.comment-input').value,
-                    originalEstado: row.dataset.originalEstado
-                });
-            });
-
-            if (itemsToUpdate.length === 0) {
-                Swal.fire('Atención', 'No hay materiales en la lista para capturar.', 'warning');
-                return;
-            }
-
-            if (hasEmptyQuantities) {
-                const confirmation = await Swal.fire({
-                    title: 'Cantidades Vacías', text: "Algunos campos de 'Cantidad Contada' están vacíos y se guardarán como 0. ¿Deseas continuar?", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ea580c', cancelButtonColor: '#64748b', confirmButtonText: 'Sí, continuar', cancelButtonText: 'No, déjame revisar'
-                });
-                if (!confirmation.isConfirmed) return;
-            }
-
-            try {
-                const response = await fetch('https://grammermx.com/Logistica/QuickInventories/dao/update_inventory.php', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(itemsToUpdate)
-                });
-                const result = await response.json();
-
                 if (result.success) {
-                    Swal.fire({
-                        title: '¡Conteo Guardado!', text: result.message, icon: 'success', confirmButtonColor: '#ea580c'
-                    }).then(() => {
-                        resultsTbody.innerHTML = '';
-                        resultsArea.classList.add('hidden');
-                        scannedItems.clear();
-                    });
-                } else { throw new Error(result.message); }
-            } catch(error) {
-                Swal.fire('Error', `Ocurrió un error al guardar: ${error.message}`, 'error');
-            }
-        });
+                    const allData = result.data;
+                    analysisDataForExport = allData; // Store data for export
 
-        function showNotification(message, color) {
-            const colorClasses = {
-                green: 'bg-green-100 border-green-400 text-green-700', red: 'bg-red-100 border-red-400 text-red-700', blue: 'bg-blue-100 border-blue-400 text-blue-700', orange: 'bg-orange-100 border-orange-400 text-orange-700',
-            };
-            notificationArea.innerHTML = `<div class="border-l-4 p-4 ${colorClasses[color]}" role="alert"><p>${message}</p></div>`;
-            setTimeout(() => { notificationArea.innerHTML = ''; }, 4000);
+                    // Filter data for status tables
+                    const pending = allData.filter(item => item.Estado == '0');
+                    const captured = allData.filter(item => item.Estado == '1');
+                    const newSystem = allData.filter(item => item.Estado == '2');
+
+                    // Define headers for each table
+                    const capturedHeaders = [ { label: 'Material', key: 'Material' }, { label: 'Descripción', key: 'Description' }, { label: 'Cant. Contada', key: 'CantidadContada' }, { label: 'UM', key: 'UnidadMedida' }, { label: 'Contador', key: 'UsuarioContador' }, { label: 'Comentario', key: 'Comentario' } ];
+                    const pendingHeaders = [ { label: 'Material', key: 'Material' }, { label: 'Descripción', key: 'Description' }, { label: 'Stock Sistema', key: 'AvadaibleStock' }, { label: 'UM', key: 'UnidadMedida' }, { label: 'Ubicación', key: 'StorageBin' } ];
+                    const newSystemHeaders = [ { label: 'Material', key: 'Material' }, { label: 'Descripción', key: 'Description' }, { label: 'Cant. Contada', key: 'CantidadContada' }, { label: 'UM', key: 'UnidadMedida' }, { label: 'Contador', key: 'UsuarioContador' }, { label: 'Ubicación', key: 'StorageBin' } ];
+
+                    const analysisHeaders = [
+                        { label: 'Material', key: 'Material' }, { label: 'Descripción', key: 'Description' }, { label: 'Ubicación', key: 'StorageBin' }, { label: 'SUN', key: 'Sun' }, { label: 'Stock Sistema', key: 'AvadaibleStock' }, { label: 'Cant. Contada', key: 'CantidadContada' }, { label: 'UM', key: 'UnidadMedida' },
+                        {
+                            label: 'Cumplimiento', key: 'Cumplimiento',
+                            format: (row) => {
+                                const available = parseFloat(row.AvadaibleStock); const counted = parseFloat(row.CantidadContada);
+                                if (isNaN(available) || isNaN(counted)) return '<span class="text-slate-400">N/A</span>';
+                                if (available > 0) { const percentage = (counted / available) * 100; const color = percentage < 95 ? 'text-red-500' : (percentage > 105 ? 'text-blue-500' : 'text-green-500'); return `<span class="font-bold ${color}">${percentage.toFixed(1)}%</span>`; }
+                                if (available === 0 && counted === 0) return '<span class="font-bold text-green-500">100%</span>';
+                                return '<span class="font-bold text-sky-500">Extra</span>';
+                            }
+                        },
+                        {
+                            label: 'Costo Total Contado', key: 'CostoTotalContado',
+                            format: (row) => {
+                                const cost = parseFloat(row.CostoTotalContado);
+                                if (isNaN(cost)) return '<span class="text-slate-400">N/A</span>';
+                                return cost.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
+                            }
+                        },
+                        { label: 'Contador', key: 'UsuarioContador' }
+                    ];
+
+                    // Create tables
+                    createTable(pendingHeaders, pending, 'pending-table-container');
+                    createTable(capturedHeaders, captured, 'captured-table-container');
+                    createTable(newSystemHeaders, newSystem, 'new-system-table-container');
+                    createTable(analysisHeaders, allData, 'analysis-table-container');
+
+                } else { throw new Error(result.message); }
+            } catch (error) {
+                console.error('Error loading inventory data:', error);
+                const containers = ['pending-table-container', 'captured-table-container', 'new-system-table-container', 'analysis-table-container'];
+                containers.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.innerHTML = `<div class="text-center py-10 text-red-500">Error al cargar los datos: ${error.message}</div>`;
+                });
+            }
+        };
+
+        const downloadBtn = document.getElementById('download-excel-btn');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', () => {
+                if (analysisDataForExport.length === 0) {
+                    Swal.fire('Atención', 'No hay datos para exportar.', 'warning');
+                    return;
+                }
+                const exportData = analysisDataForExport.map(row => {
+                    const available = parseFloat(row.AvadaibleStock); const counted = parseFloat(row.CantidadContada);
+                    let compliance = 'N/A';
+                    if (!isNaN(available) && !isNaN(counted)) {
+                        if (available > 0) { compliance = `${((counted / available) * 100).toFixed(1)}%`; }
+                        else if (available === 0 && counted === 0) { compliance = '100%'; }
+                        else { compliance = 'Extra'; }
+                    }
+                    const totalCost = parseFloat(row.CostoTotalContado);
+                    return {
+                        'Material': row.Material, 'Descripción': row.Description, 'Ubicación': row.StorageBin, 'SUN': row.Sun, 'Stock Sistema': available, 'Cant. Contada': counted, 'UM': row.UnidadMedida, 'Cumplimiento': compliance, 'Costo Total Contado (MXN)': !isNaN(totalCost) ? totalCost : 'N/A', 'Contador': row.UsuarioContador, 'Comentario': row.Comentario,
+                    };
+                });
+                const worksheet = XLSX.utils.json_to_sheet(exportData);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Análisis de Inventario");
+                const cols = Object.keys(exportData[0] || {});
+                const colWidths = cols.map(key => ({ wch: Math.max(key.length, ...exportData.map(row => String(row[key] ?? '').length)) + 2 }));
+                worksheet['!cols'] = colWidths;
+                XLSX.writeFile(workbook, "Analisis_Inventario.xlsx");
+            });
         }
+        loadInventoryData();
     });
 </script>
 </body>
 </html>
+

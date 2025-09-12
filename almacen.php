@@ -175,7 +175,7 @@
 
         async function searchSun(sunValue) {
             if (scannedItems.has(sunValue)) {
-                showNotification(`El SUN ${sunValue} ya ha sido agregado a la lista.`, 'orange');
+                showNotification(`El SUN ${sunValue} ya ha sido agregado a la lista actual.`, 'orange');
                 sunInput.value = '';
                 sunInput.focus();
                 return;
@@ -187,9 +187,20 @@
                 const result = await response.json();
 
                 if (result.success && result.data.length > 0) {
+                    const firstItem = result.data[0];
+
+                    // <-- **CAMBIO CLAVE: Validar si el estado es 1 (capturado)** -->
+                    if (firstItem.Estado == '1') {
+                        showNotification(`El SUN ${sunValue} ya fue capturado y no se puede contar de nuevo.`, 'orange');
+                        sunInput.value = '';
+                        sunInput.focus();
+                        return; // Detiene la ejecución para no agregarlo a la tabla
+                    }
+
                     resultsArea.classList.remove('hidden');
                     addItemsToTable(result.data);
-                    showNotification(`SUN ${sunValue} encontrado y agregado.`, 'green');
+                    showNotification(`SUN ${sunValue} encontrado y agregado a la lista.`, 'green');
+
                 } else {
                     showNewItemModal(sunValue);
                 }
@@ -209,8 +220,8 @@
                 const row = document.createElement('tr');
                 row.className = 'border-b border-slate-200 hover:bg-slate-50';
                 row.dataset.id = item.IdInventario;
+                row.dataset.originalEstado = item.Estado;
 
-                // Safely parse the stock number
                 const stock = parseFloat(String(item.AvadaibleStock).replace(/,/g, '')) || 0;
 
                 row.innerHTML = `
@@ -233,7 +244,6 @@
                     </td>
                 `;
                 resultsTbody.appendChild(row);
-                //row.querySelector('.quantity-input').focus();
             });
         }
 
@@ -241,7 +251,7 @@
             const deleteButton = e.target.closest('.delete-btn');
             if (deleteButton) {
                 const row = deleteButton.closest('tr');
-                const sunCell = row.cells[5]; // SUN is the 6th cell (index 5)
+                const sunCell = row.cells[5];
                 if(sunCell) {
                     const sunToRemove = sunCell.textContent;
                     scannedItems.delete(sunToRemove);
@@ -277,13 +287,7 @@
                 didOpen: () => { document.getElementById('modal-material').focus(); },
                 preConfirm: () => {
                     const newItemData = {
-                        Sun: sunValue,
-                        Material: document.getElementById('modal-material').value,
-                        Description: document.getElementById('modal-description').value,
-                        StorageType: document.getElementById('modal-storagetype').value,
-                        StorageBin: document.getElementById('modal-storagebin').value,
-                        CantidadContada: document.getElementById('modal-quantity').value,
-                        UnidadMedida: document.getElementById('modal-unit').value,
+                        Sun: sunValue, Material: document.getElementById('modal-material').value, Description: document.getElementById('modal-description').value, StorageType: document.getElementById('modal-storagetype').value, StorageBin: document.getElementById('modal-storagebin').value, CantidadContada: document.getElementById('modal-quantity').value, UnidadMedida: document.getElementById('modal-unit').value,
                     };
 
                     if (!newItemData.Material || !newItemData.Description || !newItemData.CantidadContada || !newItemData.UnidadMedida) {
@@ -293,38 +297,21 @@
 
                     Swal.showLoading();
                     return fetch('https://grammermx.com/Logistica/QuickInventories/dao/insert_inventory.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(newItemData)
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newItemData)
                     })
                         .then(response => {
                             if (!response.ok) throw new Error(`Error del Servidor: ${response.statusText}`);
-                            // Important: Check if the response is actually JSON before parsing
                             const contentType = response.headers.get("content-type");
-                            if (contentType && contentType.indexOf("application/json") !== -1) {
-                                return response.json();
-                            } else {
-                                return response.text().then(text => {
-                                    throw new Error(`Respuesta inesperada del servidor: ${text}`);
-                                });
-                            }
+                            if (contentType && contentType.includes("application/json")) { return response.json(); }
+                            else { return response.text().then(text => { throw new Error(`Respuesta inesperada: ${text}`); }); }
                         })
-                        .catch(error => {
-                            Swal.showValidationMessage(`La solicitud falló: ${error}`);
-                        });
+                        .catch(error => { Swal.showValidationMessage(`La solicitud falló: ${error}`); });
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
                     const serverResponse = result.value;
                     if (serverResponse && serverResponse.success) {
-                        Swal.fire({
-                            title: '¡Éxito!',
-                            text: serverResponse.message,
-                            icon: 'success',
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-                        // Re-search the SUN to get the full data (including the new ID) and add it to the table
+                        Swal.fire({ title: '¡Éxito!', text: serverResponse.message, icon: 'success', timer: 1500, showConfirmButton: false });
                         searchSun(sunValue);
                     } else {
                         Swal.fire('Error', `No se pudo registrar: ${serverResponse ? serverResponse.message : 'Respuesta inválida.'}`, 'error');
@@ -346,7 +333,8 @@
                 itemsToUpdate.push({
                     IdInventario: row.dataset.id,
                     CantidadContada: quantityInput.value || 0,
-                    Comentario: row.querySelector('.comment-input').value
+                    Comentario: row.querySelector('.comment-input').value,
+                    originalEstado: row.dataset.originalEstado
                 });
             });
 
@@ -357,25 +345,20 @@
 
             if (hasEmptyQuantities) {
                 const confirmation = await Swal.fire({
-                    title: 'Cantidades Vacías',
-                    text: "Algunos campos de 'Cantidad Contada' están vacíos y se guardarán como 0. ¿Deseas continuar?",
-                    icon: 'warning', showCancelButton: true, confirmButtonColor: '#ea580c',
-                    cancelButtonColor: '#64748b', confirmButtonText: 'Sí, continuar', cancelButtonText: 'No, déjame revisar'
+                    title: 'Cantidades Vacías', text: "Algunos campos de 'Cantidad Contada' están vacíos y se guardarán como 0. ¿Deseas continuar?", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ea580c', cancelButtonColor: '#64748b', confirmButtonText: 'Sí, continuar', cancelButtonText: 'No, déjame revisar'
                 });
                 if (!confirmation.isConfirmed) return;
             }
 
             try {
                 const response = await fetch('https://grammermx.com/Logistica/QuickInventories/dao/update_inventory.php', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(itemsToUpdate)
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(itemsToUpdate)
                 });
                 const result = await response.json();
 
                 if (result.success) {
                     Swal.fire({
-                        title: '¡Conteo Guardado!', text: result.message,
-                        icon: 'success', confirmButtonColor: '#ea580c'
+                        title: '¡Conteo Guardado!', text: result.message, icon: 'success', confirmButtonColor: '#ea580c'
                     }).then(() => {
                         resultsTbody.innerHTML = '';
                         resultsArea.classList.add('hidden');
@@ -389,10 +372,7 @@
 
         function showNotification(message, color) {
             const colorClasses = {
-                green: 'bg-green-100 border-green-400 text-green-700',
-                red: 'bg-red-100 border-red-400 text-red-700',
-                blue: 'bg-blue-100 border-blue-400 text-blue-700',
-                orange: 'bg-orange-100 border-orange-400 text-orange-700',
+                green: 'bg-green-100 border-green-400 text-green-700', red: 'bg-red-100 border-red-400 text-red-700', blue: 'bg-blue-100 border-blue-400 text-blue-700', orange: 'bg-orange-100 border-orange-400 text-orange-700',
             };
             notificationArea.innerHTML = `<div class="border-l-4 p-4 ${colorClasses[color]}" role="alert"><p>${message}</p></div>`;
             setTimeout(() => { notificationArea.innerHTML = ''; }, 4000);
