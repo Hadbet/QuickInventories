@@ -171,7 +171,7 @@
             if (row.length < 2 || !row[1]) return null;
             const stockString = String(row[9] || '0').replace(/,/g, '');
             return {
-                Material: String(row[1]).trim(), Plant: String(row[3]).trim(), StorageLocation: String(row[4]).trim(), Description: String(row[5]).trim(), StorageType: String(row[6] || '').trim(), StorageBin: String(row[8] || '').trim(), AvadaibleStock: parseFloat(stockString), UnidadMedida: String(row[10]).trim(), Sun: String(row[14] || '').trim(), CantidadContada: 0, UsuarioContador: 'Carga Masiva LX02', Comentario: '', Tipo: 'LX02'
+                Material: String(row[1]).trim(), Plant: String(row[3]).trim(), StorageLocation: String(row[4]).trim(), Description: String(row[5]).trim(), StorageType: String(row[6] || '').trim(), StorageBin: String(row[8] || '').trim(), AvadaibleStock: parseFloat(stockString), UnidadMedida: String(row[10]).trim(), Sun: String(row[14] || '').trim(), CantidadContada: 0, UsuarioContador: '', Comentario: '', Tipo: ''
             };
         }).filter(item => item !== null);
 
