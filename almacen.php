@@ -233,7 +233,7 @@
                     </td>
                 `;
                 resultsTbody.appendChild(row);
-                row.querySelector('.quantity-input').focus();
+                //row.querySelector('.quantity-input').focus();
             });
         }
 
