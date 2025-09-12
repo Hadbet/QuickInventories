@@ -67,7 +67,7 @@
                     </div>
                     <div class="grid md:grid-cols-2 gap-6 pt-4">
                         <div>
-                            <label for="quantity-input" class="block text-sm font-medium text-slate-700">Cantidad Producida *</label>
+                            <label for="quantity-input" class="block text-sm font-medium text-slate-700">Cantidad Contada *</label>
                             <input type="number" step="any" id="quantity-input" placeholder="0.00" class="w-full mt-1 p-3 border border-slate-300 rounded-lg focus:ring-orange-500 focus:border-orange-500">
                         </div>
                         <div>
