@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SheetJS (xlsx.js) for reading Excel files -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .upload-card {
             @apply bg-white rounded-2xl shadow-lg p-8 text-center transition-all duration-300;
@@ -72,6 +74,35 @@
                 <p class="text-gray-500">Próximamente disponible.</p>
             </div>
         </div>
+
+        <!-- Maintenance Section -->
+        <div class="mt-16 pt-8 border-t-2 border-slate-200">
+            <h2 class="text-2xl font-bold text-slate-700 mb-8 text-center">Acciones de Mantenimiento</h2>
+            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                <!-- Delete Inventario Card -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 mx-auto text-red-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Borrar Inventario (LX02)</h3>
+                    <p class="text-gray-500 mb-6">Elimina todos los registros de la tabla `Inventario`.</p>
+                    <button id="delete-inventory-btn" class="w-full bg-red-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-red-700 transition-colors">
+                        Borrar Registros
+                    </button>
+                </div>
+                <!-- Delete Partes Card -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 text-center opacity-60">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 mx-auto text-red-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Borrar Catálogo (MM60)</h3>
+                    <p class="text-gray-500 mb-6">Elimina los registros de la tabla `Parte` (Próximamente).</p>
+                    <button id="delete-parts-btn" class="w-full bg-red-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-red-700 transition-colors" disabled>
+                        Borrar Catálogo
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </main>
 
@@ -81,6 +112,8 @@
     const filenameDisplay = document.getElementById('lx02-filename');
     const processButton = document.getElementById('process-lx02');
     const notification = document.getElementById('notification');
+    const deleteInventoryBtn = document.getElementById('delete-inventory-btn');
+    const deletePartsBtn = document.getElementById('delete-parts-btn');
     let inventoryItems = [];
 
     // --- Mobile Menu Logic ---
@@ -89,12 +122,14 @@
     const openIcon = document.getElementById('menu-open-icon');
     const closeIcon = document.getElementById('menu-close-icon');
 
-    menuButton.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
-        openIcon.classList.toggle('hidden');
-        openIcon.classList.toggle('inline-flex');
-        closeIcon.classList.toggle('hidden');
-    });
+    if(menuButton){
+        menuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            openIcon.classList.toggle('hidden');
+            openIcon.classList.toggle('inline-flex');
+            closeIcon.classList.toggle('hidden');
+        });
+    }
 
     // --- Excel File Handling Logic ---
     fileInput.addEventListener('change', (event) => {
@@ -125,40 +160,20 @@
     });
 
     function handleParsingComplete(data) {
-        // Corregido: Los datos empiezan en la fila 8 (índice 7 del array)
         const dataStartIndex = 7;
-
         if (data.length <= dataStartIndex) {
             showNotification('El archivo no tiene el formato esperado o está vacío.', 'red');
             resetFileState();
             return;
         }
 
-        // Corregido: Mapeo de columnas según el formato real del Excel.
-        // B=1, D=3, E=4, F=5, G=6, I=8, J=9, K=10, O=14
         inventoryItems = data.slice(dataStartIndex).map(row => {
-            // Se valida que la fila tenga suficientes columnas y que el Material (columna B) no esté vacío.
             if (row.length < 2 || !row[1]) return null;
-
-            // Limpia el número de stock, quitando comas.
             const stockString = String(row[9] || '0').replace(/,/g, '');
-
             return {
-                Material: String(row[1]).trim(),
-                Plant: String(row[3]).trim(),
-                StorageLocation: String(row[4]).trim(),
-                Description: String(row[5]).trim(),
-                StorageType: String(row[6] || '').trim(),
-                StorageBin: String(row[8] || '').trim(),
-                AvadaibleStock: parseFloat(stockString),
-                UnidadMedida: String(row[10]).trim(),
-                Sun: String(row[14] || '').trim(), // Columna O es Storage Unit
-                CantidadContada: 0,
-                UsuarioContador: 'Carga Masiva LX02',
-                Comentario: '',
-                Tipo: 'LX02'
+                Material: String(row[1]).trim(), Plant: String(row[3]).trim(), StorageLocation: String(row[4]).trim(), Description: String(row[5]).trim(), StorageType: String(row[6] || '').trim(), StorageBin: String(row[8] || '').trim(), AvadaibleStock: parseFloat(stockString), UnidadMedida: String(row[10]).trim(), Sun: String(row[14] || '').trim(), CantidadContada: 0, UsuarioContador: 'Carga Masiva LX02', Comentario: '', Tipo: 'LX02'
             };
-        }).filter(item => item !== null); // Filtra las filas que no eran válidas (null).
+        }).filter(item => item !== null);
 
         if (inventoryItems.length > 0) {
             showNotification(`Se encontraron ${inventoryItems.length} registros válidos. Listo para procesar.`, 'green');
@@ -190,6 +205,33 @@
         processButton.disabled = true;
         processButton.textContent = 'Enviando...';
         sendDataToBackend(inventoryItems);
+    });
+
+    deleteInventoryBtn.addEventListener('click', () => {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Se eliminarán TODOS los registros de la tabla de inventario. ¡Esta acción no se puede revertir!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, ¡bórralo todo!',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // El archivo PHP debe estar en la carpeta 'dao'
+                fetch('https://grammermx.com/Logistica/QuickInventories/dao/delete_inventory.php', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('¡Eliminado!', data.message, 'success');
+                        } else {
+                            Swal.fire('Error', data.message, 'error');
+                        }
+                    })
+                    .catch(error => Swal.fire('Error de Conexión', error.message, 'error'));
+            }
+        });
     });
 
     // --- Backend Communication ---
@@ -231,4 +273,3 @@
 </script>
 </body>
 </html>
-
