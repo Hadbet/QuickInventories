@@ -1,319 +1,63 @@
+<nav class="bg-gradient-to-r from-orange-600 to-orange-800 text-white shadow-xl fixed top-0 left-0 right-0 z-50">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex justify-between items-center h-20">
+            <!-- Logo/Brand -->
+            <div class="flex-shrink-0 flex items-center space-x-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                <h1 class="text-2xl font-bold text-white">Grammer Quick Inventor</h1>
+            </div>
 
-<?php
-session_start();
-
-if ($_SESSION["nominaCurso"] == "" && $_SESSION["nominaCurso"]== null && $_SESSION["rol"]== "" && $_SESSION["rol"]== null) {
-    echo "<META HTTP-EQUIV='REFRESH' CONTENT='1; URL=index.html'>";
-    session_destroy();
-}else{
-    session_start();
-    $rol =$_SESSION['rol'];
-    $area =$_SESSION['area'];
-    $areaNombre =$_SESSION['AreaNombre'];
-    $tipoArea =$_SESSION['tipoArea'];
-    $bin =$_SESSION['StBin'];
-}
-$auditor='<a class="nav-link pl-3" href="verificacion.php"><span class="ml-1">Validacion</span></a>';
-
-if ($tipoArea==2){
-    $captura = '<ul class="collapse list-unstyled pl-4 w-100 collapse show" id="contact">
-                    <a class="nav-link pl-3" href="form_registro.php"><span class="ml-1">Captura SUM</span></a>
-                </ul>';
-
-    $auditor = '<a class="nav-link pl-3" href="verificacion_almacen.php"><span class="ml-1">Validacion</span></a>';
-}
-
-if ($tipoArea==1){
-    $captura = '<ul class="collapse list-unstyled pl-4 w-100 collapse show" id="contact">
-                    <a class="nav-link pl-3" href="form_registro_produccion.php"><span class="ml-1">Captura Produccion</span></a>
-                </ul>';
-    $auditor='<a class="nav-link pl-3" href="form_validacion_produccion.php"><span class="ml-1">Validacion</span></a>';
-}
-
-if ($tipoArea==0){
-    $captura = '<ul class="collapse list-unstyled pl-4 w-100 collapse show" id="contact">
-                    <a class="nav-link pl-3" href="form_registro_almacen.php"><span class="ml-1">Captura Almacen</span></a>
-                </ul>';
-    $auditor='<a class="nav-link pl-3" href="form_validacion_produccion.php"><span class="ml-1">Validacion</span></a>';
-}
-
-?>
-
-<nav class="topnav navbar navbar-light">
-    <button type="button" class="navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar">
-        <i class="fe fe-menu navbar-toggler-icon"></i>
-    </button>
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center space-x-2">
+                <a href="inicio.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
+                    <span>Inicio</span>
+                </a>
+                <a href="carga.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
+                    <span>Carga</span>
+                </a>
+                <a href="produccion.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0L8 8.25H3.74a1 1 0 00-.98 1.26l.96 4.87a1 1 0 00.98 .74H17a1 1 0 00.98-.74l.96-4.87a1 1 0 00-.98-1.26H12l-.51-5.08zM12 15a1 1 0 100 2h-4a1 1 0 100-2h4z" clip-rule="evenodd" /></svg>
+                    <span>Producción</span>
+                </a>
+                <a href="almacen.php" class="nav-link active flex items-center space-x-2 px-3 py-2 text-sm font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6z" /></svg>
+                    <span>Almacén</span>
+                </a>
+                <a href="#" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                    <span>Location</span>
+                </a>
+                <a href="#" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" /></svg>
+                    <span>Usuarios</span>
+                </a>
+                <a href="#" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" /></svg>
+                    <span>Salir</span>
+                </a>
+            </div>
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden flex items-center">
+                <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-white/20 focus:outline-none">
+                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path id="menu-open-icon" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /><path id="menu-close-icon" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="md:hidden hidden">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            <a href="inicio.php" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Inicio</span></a>
+            <a href="carga.php" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Carga</span></a>
+            <a href="produccion.php" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Producción</span></a>
+            <a href="almacen.php" class="block nav-link active flex items-center space-x-2 px-3 py-2 text-base font-medium"><span>Almacén</span></a>
+            <a href="#" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Location</span></a>
+            <a href="#" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Usuarios</span></a>
+            <a href="#" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Salir</span></a>
+        </div>
+    </div>
 </nav>
-<aside class="sidebar-left border-right bg-white shadow" id="leftSidebar" data-simplebar>
-    <a href="#" class="btn collapseSidebar toggle-btn d-lg-none text-muted ml-2 mt-3" data-toggle="toggle">
-        <i class="fe fe-x"><span class="sr-only"></span></i>
-    </a>
-    <nav class="vertnav navbar navbar-light">
-        <!-- nav bar -->
-        <div class="w-100 mb-4 d-flex">
-            <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="inicio.php">
-                <img src="assets/images/Grammer_Logo.ico" style="width: 30%">
-            </a>
-        </div>
-
-        <?php
-        if ($rol==4){
-            echo '<p class="text-muted nav-heading mt-4 mb-1">
-            <span>Administración</span>
-        </p>
-        <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item dropdown">
-                <a href="#forms" data-toggle="collapse" aria-expanded="true" class="dropdown-toggle nav-link">
-                <i class="fe fe-feather fe-16"></i>
-                    <span class="ml-3 item-text">Inicio</span>
-                </a>
-                <ul class="collapse list-unstyled pl-4 w-100 collapse show" id="forms">
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="inicio.php"><span class="ml-1 item-text">DashBoard</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="crear_user.php"><span class="ml-1 item-text">Usuarios</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="form_registro.php"><span class="ml-1 item-text">Captura SUN</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="form_registro_produccion.php"><span class="ml-1 item-text">Captura Produccion</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="equipo_conteo.php"><span class="ml-1 item-text">Tu equipo de trabajo</span></a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item dropdown">
-                <a href="#tables" data-toggle="collapse" aria-expanded="true" class="dropdown-toggle nav-link">
-                    <i class="fe fe-archive fe-16"></i>
-                    <span class="ml-3 item-text">Historicos</span>
-                </a>
-                <ul class="collapse list-unstyled pl-4 w-100 collapse show" id="tables">
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="listas_base.php"><span class="ml-1 item-text">Marbetes</span></a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item dropdown">
-                <a href="#bases" data-toggle="collapse" aria-expanded="true" class="dropdown-toggle nav-link">
-                    <i class="fe fe-codepen fe-16"></i>
-                    <span class="ml-3 item-text">Bases de datos</span>
-                </a>
-                <ul class="collapse list-unstyled pl-4 w-100 collapse show" id="bases">
-                
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="control_parte_admin.php"><span class="ml-1 item-text">Parte</span></a>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="inventario_sap.php"><span class="ml-1 item-text">Inventario Sap</span></a>
-                    </li>
-                    
-                </ul>
-            </li>
-            <li class="nav-item dropdown">
-                <a href="#reportes" data-toggle="collapse" aria-expanded="true" class="dropdown-toggle nav-link">
-                    <i class="fe fe-book fe-16"></i>
-                    <span class="ml-3 item-text">Reportes</span>
-                </a>
-                <ul class="collapse list-unstyled pl-4 w-100 collapse show" id="reportes">
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="reporte_diferencias.php"><span class="ml-1 item-text">Reportes de diferencias</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="reporte_final.php"><span class="ml-1 item-text">Reportes Final</span></a>
-                    </li>
-                </ul>
-            </li>
-        </ul>';
-        }
-        ?>
-
-        <?php
-        if ($rol==7){
-            echo '<p class="text-muted nav-heading mt-4 mb-1">
-            <span>Coordinador de almacén </span>
-        </p>
-        <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item dropdown">
-                <a href="#forms" data-toggle="collapse" aria-expanded="true" class="dropdown-toggle nav-link">
-                <i class="fe fe-feather fe-16"></i>
-                    <span class="ml-3 item-text">Inicio</span>
-                </a>
-                <ul class="collapse list-unstyled pl-4 w-100 collapse show" id="forms">
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="inicio.php"><span class="ml-1 item-text">DashBoard</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="form_registro_coordinador.php"><span class="ml-1 item-text">Terceros conteos</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="equipo_conteo.php"><span class="ml-1 item-text">Tu equipo de trabajo</span></a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item dropdown">
-                <a href="#tables" data-toggle="collapse" aria-expanded="true" class="dropdown-toggle nav-link">
-                    <i class="fe fe-archive fe-16"></i>
-                    <span class="ml-3 item-text">Historicos</span>
-                </a>
-                <ul class="collapse list-unstyled pl-4 w-100 collapse show" id="tables">
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="listas_base.php"><span class="ml-1 item-text">Marbetes</span></a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item dropdown">
-                <a href="#reportes" data-toggle="collapse" aria-expanded="true" class="dropdown-toggle nav-link">
-                    <i class="fe fe-book fe-16"></i>
-                    <span class="ml-3 item-text">Reportes</span>
-                </a>
-                <ul class="collapse list-unstyled pl-4 w-100 collapse show" id="reportes">
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="carga_descarga.php"><span class="ml-1 item-text">Reportes en txt</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="reporte_diferencias.php"><span class="ml-1 item-text">Reportes de diferencias</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="reporte_final.php"><span class="ml-1 item-text">Reportes Final</span></a>
-                    </li>
-                </ul>
-            </li>
-        </ul>';
-        }
-        ?>
-
-        <?php
-        if($rol==1){
-            echo '<p class="text-muted nav-heading mt-4 mb-1">
-            <span>Capturistas</span>
-        </p>
-        <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item dropdown">
-                <a href="#contact" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-    <i class="fe fe-home fe-16"></i>
-                    <span class="ml-3 item-text">Inicio</span>
-                </a>
-                
-                '.$captura.'
-            </li>
-            <li class="nav-item dropdown">
-                <a href="#support" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-                    <i class="fe fe-archive fe-16"></i>
-                    <span class="ml-3 item-text">Historicos</span>
-                </a>
-                <ul class="collapse list-unstyled pl-4 w-100 collapse show" id="support">
-                    <a class="nav-link pl-3" href="listas_marbetes_produccion.php"><span class="ml-1">Reporte</span></a>
-                </ul>
-            </li>
-        </ul>';
-        }
-        ?>
-
-        <?php
-        if($rol==5){
-            echo '<p class="text-muted nav-heading mt-4 mb-1">
-            <span>Validador</span>
-        </p>
-        <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item dropdown">
-                <a href="#contact" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-    <i class="fe fe-home fe-16"></i>
-                    <span class="ml-3 item-text">Inicio</span>
-                </a>
-                <ul class="collapse list-unstyled pl-4 w-100 collapse show" id="contact">
-                    <a class="nav-link pl-3" href="form_validacion_produccion.php"><span class="ml-1">Verificar</span></a>
-                </ul>
-            </li>
-            <li class="nav-item dropdown">
-                <a href="#support" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-                    <i class="fe fe-archive fe-16"></i>
-                    <span class="ml-3 item-text">Historicos</span>
-                </a>
-                <ul class="collapse list-unstyled pl-4 w-100 collapse show" id="support">
-                    <a class="nav-link pl-3" href="listas_marbetes_produccion.php"><span class="ml-1">Reporte</span></a>
-                </ul>
-            </li>
-        </ul>';
-        }
-        ?>
-
-
-        <?php
-        if($rol==2){
-            echo '<p class="text-muted nav-heading mt-4 mb-1">
-            <span>Auditores</span>
-        </p>
-        <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item dropdown">
-                <a href="#Auditor" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-    <i class="fe fe-award fe-16"></i>
-                    <span class="ml-3 item-text">Verificacion</span>
-                </a>
-                <ul class="collapse list-unstyled pl-4 w-100 collapse show" id="Auditor">
-                    '.$auditor.'
-                </ul>
-            </li>
-            <li class="nav-item dropdown">
-                <a href="#Historico" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-                    <i class="fe fe-archive fe-16"></i>
-                    <span class="ml-3 item-text">Historicos</span>
-                </a>
-                <ul class="collapse list-unstyled pl-4 w-100 collapse show" id="Historico">
-                    <a class="nav-link pl-3" href="listas_marbetes_produccion.php"><span class="ml-1">Reporte</span></a>
-                </ul>
-            </li>
-            <a href="#LiderTestD" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-                    <i class="fe fe-trello fe-16"></i>
-                    <span class="ml-3 item-text">Control captura</span>
-                </a>
-                '.$captura.'
-        </ul>';
-        }
-        ?>
-
-
-        <?php
-        if($rol==3){
-            echo '<p class="text-muted nav-heading mt-4 mb-1">
-            <span>Lider de conteo</span>
-        </p>
-        <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item dropdown">
-                <a href="#Lider" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-                    <i class="fe fe-trello fe-16"></i>
-                    <span class="ml-3 item-text">Control de conteos</span>
-                </a>
-                <ul class="collapse list-unstyled pl-4 w-100 collapse show" id="Lider">
-                    <a class="nav-link pl-3" href="control_conteo.php"><span class="ml-1">Segundos Conteos</span></a>
-                    <a class="nav-link pl-3" href="cancelacion_marbete.php"><span class="ml-1">Cancelacion</span></a>
-                    <a class="nav-link pl-3" href="listas_base_produccion.php"><span class="ml-1">Lista de marbetes</span></a>
-                    <a class="nav-link pl-3" href="listas_marbetes_produccion.php"><span class="ml-1">Lista de captura</span></a>
-                    <a class="nav-link pl-3" href="equipo_conteo.php"><span class="ml-1">Tu equipo de trabajo</span></a>
-                </ul>
-                
-                <a href="#LiderTest" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-                    <i class="fe fe-trello fe-16"></i>
-                    <span class="ml-3 item-text">Control captura</span>
-                </a>
-                '.$captura.'
-                '.$auditor.'
-            </li>
-        </ul>';
-        }
-        ?>
-
-
-        
-
-        <div class="btn-box w-100 mt-4 mb-1">
-            <a href="dao/logout.php" target="_blank" class="btn mb-2 btn-danger btn-lg btn-block">
-                <i class="fe fe-log-out fe-12 mx-2 text-white"></i><span class="small text-white">Salir</span>
-            </a>
-        </div>
-    </nav>
-</aside>
-

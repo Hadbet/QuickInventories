@@ -24,6 +24,9 @@
             box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.3) !important; /* Ring for focus */
             border-color: #ea580c !important; /* Tailwind's border-orange-500 */
         }
+        .quantity-input:disabled {
+            @apply bg-slate-200 cursor-pointer;
+        }
     </style>
 </head>
 <body class="bg-slate-100 font-sans">
@@ -189,12 +192,11 @@
                 if (result.success && result.data.length > 0) {
                     const firstItem = result.data[0];
 
-                    // <-- **CAMBIO CLAVE: Validar si el estado es 1 (capturado)** -->
                     if (firstItem.Estado == '1') {
                         showNotification(`El SUN ${sunValue} ya fue capturado y no se puede contar de nuevo.`, 'orange');
                         sunInput.value = '';
                         sunInput.focus();
-                        return; // Detiene la ejecución para no agregarlo a la tabla
+                        return;
                     }
 
                     resultsArea.classList.remove('hidden');
@@ -229,7 +231,7 @@
                     <td class="p-3">${item.Description}</td>
                     <td class="p-3">${stock} ${item.UnidadMedida}</td>
                     <td class="p-3">
-                        <input type="number" value="${stock}" step="any" placeholder="0.00" class="w-32 p-2 border border-slate-300 rounded-md focus:ring-orange-500 focus:border-orange-500 quantity-input">
+                        <input type="number" value="${stock}" step="any" placeholder="0.00" class="w-32 p-2 border border-slate-300 rounded-md focus:ring-orange-500 focus:border-orange-500 quantity-input" disabled>
                     </td>
                     <td class="p-3">
                         <input type="text" placeholder="Comentario..." class="w-full p-2 border border-slate-300 rounded-md focus:ring-orange-500 focus:border-orange-500 comment-input">
@@ -247,7 +249,9 @@
             });
         }
 
+        // --- **CAMBIO CLAVE: Listener combinado para borrado y desbloqueo de input** ---
         resultsTbody.addEventListener('click', (e) => {
+            // Lógica para el botón de borrar
             const deleteButton = e.target.closest('.delete-btn');
             if (deleteButton) {
                 const row = deleteButton.closest('tr');
@@ -260,6 +264,28 @@
                 if (resultsTbody.rows.length === 0) {
                     resultsArea.classList.add('hidden');
                 }
+                return; // Detener para no activar la lógica del input
+            }
+
+            // Lógica para desbloquear el input de cantidad
+            const quantityInput = e.target;
+            if (quantityInput.classList.contains('quantity-input') && quantityInput.disabled) {
+                Swal.fire({
+                    title: '¿Modificar Cantidad?',
+                    text: "Solo aplica cuando es una caja abierta. ¿Deseas editar la cantidad?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ea580c',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Sí, editar',
+                    cancelButtonText: 'No'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        quantityInput.disabled = false;
+                        quantityInput.focus();
+                        quantityInput.select(); // Selecciona el texto para sobreescribir fácilmente
+                    }
+                });
             }
         });
 
@@ -327,7 +353,7 @@
 
             rows.forEach(row => {
                 const quantityInput = row.querySelector('.quantity-input');
-                if (quantityInput.value === '' || quantityInput.value === null) {
+                if (!quantityInput.disabled && (quantityInput.value === '' || quantityInput.value === null)) {
                     hasEmptyQuantities = true;
                 }
                 itemsToUpdate.push({
