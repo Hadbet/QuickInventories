@@ -98,6 +98,7 @@
 
         let userCountsChart = null;
         let stockDifferenceChart = null;
+        let analysisDataForExport = [];
 
         const createTable = (headers, data, containerId) => {
             const container = document.getElementById(containerId);
@@ -198,6 +199,38 @@
             });
         };
 
+        // --- **INICIO DE LA CORRECCIÓN: Función para calcular el resumen en el cliente** ---
+        const calculateSummary = (data) => {
+            if (!data || data.length === 0) {
+                return null;
+            }
+            const countsByUser = {};
+            let totalSystemStock = 0;
+            let totalCountedStock = 0;
+
+            data.forEach(item => {
+                totalSystemStock += parseFloat(item.AvadaibleStock) || 0;
+                totalCountedStock += parseFloat(item.CantidadContada) || 0;
+                if (item.Estado == '1' || item.Estado == '2') {
+                    const user = item.UsuarioContador;
+                    if (user && user.trim() !== '') {
+                        if (!countsByUser[user]) {
+                            countsByUser[user] = 0;
+                        }
+                        countsByUser[user]++;
+                    }
+                }
+            });
+            return {
+                countsByUser: countsByUser,
+                stockComparison: {
+                    system: totalSystemStock,
+                    counted: totalCountedStock
+                }
+            };
+        };
+        // --- **FIN DE LA CORRECCIÓN** ---
+
 
         const loadInventoryData = async () => {
             try {
@@ -212,19 +245,20 @@
 
                 if (result.success) {
                     const allData = result.data;
-                    const summary = result.summary;
-
                     analysisDataForExport = allData;
 
-                    if (summary && summary.countsByUser && summary.stockComparison) {
+                    // --- **CORRECCIÓN: Llamar a la función que calcula el resumen** ---
+                    const summary = calculateSummary(allData);
+
+                    if (summary) {
                         renderUserCountsChart(summary);
                         renderStockDifferenceChart(summary);
                     } else {
-                        console.warn("Datos de resumen para las gráficas no encontrados.");
+                        console.warn("No hay datos para generar las gráficas.");
                         const userChartContainer = document.getElementById('userCountsChart').parentElement;
                         const stockChartContainer = document.getElementById('stockDifferenceChart').parentElement;
-                        userChartContainer.innerHTML = '<div class="text-center h-full flex items-center justify-center text-slate-500">No se pudieron cargar los datos de la gráfica.</div>';
-                        stockChartContainer.innerHTML = '<div class="text-center h-full flex items-center justify-center text-slate-500">No se pudieron cargar los datos de la gráfica.</div>';
+                        userChartContainer.innerHTML = '<div class="text-center h-full flex items-center justify-center text-slate-500">No hay datos para la gráfica.</div>';
+                        stockChartContainer.innerHTML = '<div class="text-center h-full flex items-center justify-center text-slate-500">No hay datos para la gráfica.</div>';
                     }
 
                     const pending = allData.filter(item => item.Estado == '0');
