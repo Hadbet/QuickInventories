@@ -10,8 +10,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .nav-link.active { @apply bg-white/20 rounded-md; }
-        .form-input { @apply w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow; }
-        .form-label { @apply block text-sm font-semibold text-slate-600 mb-2; }
     </style>
 </head>
 <body class="bg-slate-100 font-sans flex flex-col min-h-screen">
@@ -35,20 +33,20 @@
                 <h3 class="text-2xl font-bold text-slate-800 mb-6 text-center">Registrar Nuevo Usuario</h3>
                 <form id="add-user-form" class="space-y-6">
                     <div>
-                        <label for="username" class="form-label">Usuario</label>
-                        <input type="text" id="username" name="username" class="form-input" required>
+                        <label for="username" class="block text-sm font-semibold text-slate-600 mb-2">Usuario</label>
+                        <input type="text" id="username" name="username" class="w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow" required>
                     </div>
                     <div>
-                        <label for="nombre" class="form-label">Nombre Completo</label>
-                        <input type="text" id="nombre" name="nombre" class="form-input" required>
+                        <label for="nombre" class="block text-sm font-semibold text-slate-600 mb-2">Nombre Completo</label>
+                        <input type="text" id="nombre" name="nombre" class="w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow" required>
                     </div>
                     <div>
-                        <label for="password" class="form-label">Contraseña</label>
-                        <input type="password" id="password" name="password" class="form-input" required>
+                        <label for="password" class="block text-sm font-semibold text-slate-600 mb-2">Contraseña</label>
+                        <input type="password" id="password" name="password" class="w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow" required>
                     </div>
                     <div>
-                        <label for="rol" class="form-label">Rol</label>
-                        <select id="rol" name="rol" class="form-input bg-white" required>
+                        <label for="rol" class="block text-sm font-semibold text-slate-600 mb-2">Rol</label>
+                        <select id="rol" name="rol" class="bg-white w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow" required>
                             <option value="2">Usuario Normal</option>
                             <option value="1">Super Usuario</option>
                         </select>
@@ -101,7 +99,7 @@
 
         const loadUsers = async () => {
             try {
-                const response = await fetch('https://grammermx.com/Logistica/QuickInventories/dao/get_users.php');
+                const response = await fetch('dao/get_users.php');
                 if (!response.ok) throw new Error('Network response was not ok');
 
                 const result = await response.json();
@@ -149,7 +147,7 @@
             const data = Object.fromEntries(formData.entries());
 
             try {
-                const response = await fetch('https://grammermx.com/Logistica/QuickInventories/dao/add_user.php', {
+                const response = await fetch('dao/add_user.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -187,3 +185,4 @@
 </script>
 </body>
 </html>
+
