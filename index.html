@@ -1,118 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - Inventario Grammer Queretaro</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-    <link rel="Stylesheet" type="text/css" href="css/login.css">
-    <link rel="shortcut icon" href="assets/images/iconoarriba.png" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Grammer Quick Inventor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px) rotate(-5deg); }
-            50% { transform: translateX(5px) rotate(5deg); }
-            75% { transform: translateX(-5px) rotate(-5deg); }
-            100% { transform: translateX(0) rotate(0); }
+        #video-bg {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -1;
+            object-fit: cover;
+            filter: blur(4px) brightness(0.6);
         }
-
-        .shake-animation {
-            animation: shake 0.5s ease-in-out infinite;
+        .form-container {
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
+<body class="bg-slate-900">
 
-<body>
+<video autoplay muted loop id="video-bg">
+    <source src="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4" type="video/mp4">
+    Tu navegador no soporta videos en background.
+</video>
 
-<div class="container">
-    <div class="forms-container">
-        <div class="signin-signup">
-            <form id="FormSolicitante" action="dao/login.php"  method="post" class="sign-in-form">
-                <h2 class="title">Iniciar sesión</h2>
-                <div id=aviso></div>
-                <div id='correoAux' class="input-field">
-                    <i class="fas fa-user"></i>
-                    <input type="text" placeholder="Usuario" name="nomina" id="nomina" autocomplete="off"  required />
-                </div>
-                <div class="input-field">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" placeholder="Contraseña" name="password" id="password" autocomplete="off" required />
-                </div>
-                <input type="submit" name="btnSolicitante" value="Iniciar Sesión" class="btn solid" />
-                <p class="social-text">Sigue a Grammer en sus diferentes plataformas</p>
-                <div class="social-media">
-                    <a href="https://www.facebook.com/grammerqueretaro/?locale=es_LA" class="social-icon">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="https://grammer365.sharepoint.com/sites/intranet-home" class="social-icon">
-                        <i class="fas fa-globe-americas"></i>
-                    </a>
-                    <a href="#" class="social-icon">
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
-                </div>
-            </form>
-            <form id="FormAdministrador" action="dao/daoLogin.php" method="post" class="sign-up-form">
-                <p class="social-text">Sigue a Grammer en sus diferentes plataformas</p>
-                <div class="social-media">
-                    <a href="https://www.facebook.com/grammerqueretaro/?locale=es_LA" class="social-icon">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="https://grammer365.sharepoint.com/sites/intranet-home" class="social-icon">
-                        <i class="fas fa-globe-americas"></i>
-                    </a>
-                    <a href="https://www.grammer.com/en/locations/americas/mexico.html" class="social-icon">
-                        <i class="fab fa-google"></i>
-                    </a>
-                    <a href="#" class="social-icon">
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
-                </div>
-            </form>
+<div class="flex items-center justify-center min-h-screen px-4">
+    <div class="w-full max-w-md p-8 space-y-8 bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl form-container">
+        <div class="text-center">
+            <h1 class="text-4xl font-extrabold text-white">Grammer Quick Inventor</h1>
+            <p class="mt-2 text-slate-300">Bienvenido, por favor inicia sesión.</p>
         </div>
-    </div>
-
-    <div class="panels-container">
-        <div class="panel left-panel">
-            <div class="content">
-                <h3>Hola nuevamente</h3>
-                <p>
-                    Ingresa tus datos para entrar al sistema de inventario Grammer Queretaro
-                </p>
-                <button class="btn transparent" id="sign-up-btn" style="display: none">
-                    Entrar
-                </button>
+        <form id="login-form" class="space-y-6">
+            <div>
+                <label for="username" class="sr-only">Usuario</label>
+                <input type="text" id="username" name="username" class="w-full px-5 py-3 text-white bg-white/20 border border-slate-500 rounded-lg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Usuario" required>
             </div>
-            <img src="assets/images/login/login_1.png" class="image" alt="" />
-        </div>
-        <div class="panel right-panel">
-            <div class="content">
-                <h3>Si tienes cuenta</h3>
-                <p>
-                    Entra aquí e ingresa solo con tu nómina y password para comenzar
-                </p>
-                <button class="btn transparent" id="sign-in-btn">
-                    Entrar
-                </button>
+            <div>
+                <label for="password" class="sr-only">Contraseña</label>
+                <input type="password" id="password" name="password" class="w-full px-5 py-3 text-white bg-white/20 border border-slate-500 rounded-lg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Contraseña" required>
             </div>
-            <img src="assets/images/login/login_2.png" class="image" alt="" />
-        </div>
+            <button type="submit" class="w-full bg-orange-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-orange-700 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-orange-600">
+                Iniciar Sesión
+            </button>
+        </form>
     </div>
 </div>
 
 <script>
-    const sign_in_btn = document.querySelector("#sign-in-btn");
-    const sign_up_btn = document.querySelector("#sign-up-btn");
-    const container = document.querySelector(".container");
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginForm = document.getElementById('login-form');
 
-    sign_up_btn.addEventListener("click", () => {
-        container.classList.add("sign-up-mode");
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(loginForm);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('https://grammermx.com/Logistica/QuickInventories/dao/validate_login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Redirigir a la página de inicio si el login es exitoso
+                    window.location.href = 'inicio.php';
+                } else {
+                    Swal.fire({
+                        title: 'Error de Acceso',
+                        text: result.message,
+                        icon: 'error',
+                        confirmButtonColor: '#ea580c'
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    title: 'Error de Conexión',
+                    text: 'No se pudo conectar con el servidor. Por favor, intenta de nuevo.',
+                    icon: 'error',
+                    confirmButtonColor: '#ea580c'
+                });
+            }
+        });
     });
-
-    sign_in_btn.addEventListener("click", () => {
-        container.classList.remove("sign-up-mode");
-    });
-
 </script>
 
 </body>
