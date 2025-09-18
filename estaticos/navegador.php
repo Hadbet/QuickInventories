@@ -1,6 +1,14 @@
 <?php
 // Obtiene el nombre del archivo de la página actual (ej. "inicio.php")
 $currentPage = basename($_SERVER['PHP_SELF']);
+
+// Si la sesión no está iniciada, la iniciamos para poder leer el rol.
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Determinamos el rol del usuario. Si no está definido, asumimos un rol sin permisos (e.g., 0).
+$userRol = isset($_SESSION['rol']) ? $_SESSION['rol'] : 0;
 ?>
 <nav class="bg-gradient-to-r from-orange-600 to-orange-800 text-white shadow-xl fixed top-0 left-0 right-0 z-50">
     <div class="max-w-7xl mx-auto px-4">
@@ -15,30 +23,23 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
             <!-- Desktop Menu -->
             <div class="hidden md:flex items-center space-x-2">
-                <a href="inicio.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md <?php echo ($currentPage == 'inicio.php') ? 'active' : ''; ?>">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
-                    <span>Inicio</span>
-                </a>
-                <a href="carga.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md <?php echo ($currentPage == 'carga.php') ? 'active' : ''; ?>">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
-                    <span>Carga</span>
-                </a>
-                <a href="produccion.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md <?php echo ($currentPage == 'produccion.php') ? 'active' : ''; ?>">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0L8 8.25H3.74a1 1 0 00-.98 1.26l.96 4.87a1 1 0 00.98 .74H17a1 1 0 00.98-.74l.96-4.87a1 1 0 00-.98-1.26H12l-.51-5.08zM12 15a1 1 0 100 2h-4a1 1 0 100-2h4z" clip-rule="evenodd" /></svg>
-                    <span>Producción</span>
-                </a>
-                <a href="almacen.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md <?php echo ($currentPage == 'almacen.php') ? 'active' : ''; ?>">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6z" /></svg>
-                    <span>Almacén</span>
-                </a>
-                <a href="usuarios.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md <?php echo ($currentPage == 'usuarios.php') ? 'active' : ''; ?>">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" /></svg>
-                    <span>Usuarios</span>
-                </a>
-                <a href="logout.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" /></svg>
-                    <span>Salir</span>
-                </a>
+                <?php if ($userRol == 1) : // Menú para Super Usuario ?>
+                    <a href="inicio.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md <?php echo ($currentPage == 'inicio.php') ? 'active' : ''; ?>"><span>Inicio</span></a>
+                    <a href="carga.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md <?php echo ($currentPage == 'carga.php') ? 'active' : ''; ?>"><span>Carga</span></a>
+                <?php endif; ?>
+
+                <?php if ($userRol == 1 || $userRol == 2) : // Menú para ambos roles ?>
+                    <a href="produccion.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md <?php echo ($currentPage == 'produccion.php') ? 'active' : ''; ?>"><span>Producción</span></a>
+                    <a href="almacen.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md <?php echo ($currentPage == 'almacen.php') ? 'active' : ''; ?>"><span>Almacén</span></a>
+                <?php endif; ?>
+
+                <?php if ($userRol == 1) : // Menú solo para Super Usuario ?>
+                    <a href="usuarios.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md <?php echo ($currentPage == 'usuarios.php') ? 'active' : ''; ?>"><span>Usuarios</span></a>
+                <?php endif; ?>
+
+                <a href="perfil.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md <?php echo ($currentPage == 'perfil.php') ? 'active' : ''; ?>"><span>Perfil</span></a>
+                <a href="logout.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md"><span>Salir</span></a>
+
             </div>
             <!-- Mobile Menu Button -->
             <div class="md:hidden flex items-center">
@@ -51,12 +52,23 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="md:hidden hidden">
         <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <a href="inicio.php" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md <?php echo ($currentPage == 'inicio.php') ? 'active' : ''; ?>"><span>Inicio</span></a>
-            <a href="carga.php" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md <?php echo ($currentPage == 'carga.php') ? 'active' : ''; ?>"><span>Carga</span></a>
-            <a href="produccion.php" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md <?php echo ($currentPage == 'produccion.php') ? 'active' : ''; ?>"><span>Producción</span></a>
-            <a href="almacen.php" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md <?php echo ($currentPage == 'almacen.php') ? 'active' : ''; ?>"><span>Almacén</span></a>
-            <a href="usuarios.php" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md <?php echo ($currentPage == 'usuarios.php') ? 'active' : ''; ?>"><span>Usuarios</span></a>
-            <a href="dao/logout.php" class="block nav-link flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-white/20 rounded-md"><span>Salir</span></a>
+            <?php if ($userRol == 1) : ?>
+                <a href="inicio.php" class="block nav-link px-3 py-2 text-base font-medium text-white rounded-md <?php echo ($currentPage == 'inicio.php') ? 'active' : ''; ?>">Inicio</a>
+                <a href="carga.php" class="block nav-link px-3 py-2 text-base font-medium text-white rounded-md <?php echo ($currentPage == 'carga.php') ? 'active' : ''; ?>">Carga</a>
+            <?php endif; ?>
+
+            <?php if ($userRol == 1 || $userRol == 2) : ?>
+                <a href="produccion.php" class="block nav-link px-3 py-2 text-base font-medium text-white rounded-md <?php echo ($currentPage == 'produccion.php') ? 'active' : ''; ?>">Producción</a>
+                <a href="almacen.php" class="block nav-link px-3 py-2 text-base font-medium text-white rounded-md <?php echo ($currentPage == 'almacen.php') ? 'active' : ''; ?>">Almacén</a>
+            <?php endif; ?>
+
+            <?php if ($userRol == 1) : ?>
+                <a href="usuarios.php" class="block nav-link px-3 py-2 text-base font-medium text-white rounded-md <?php echo ($currentPage == 'usuarios.php') ? 'active' : ''; ?>">Usuarios</a>
+            <?php endif; ?>
+
+            <a href="perfil.php" class="block nav-link px-3 py-2 text-base font-medium text-white rounded-md <?php echo ($currentPage == 'perfil.php') ? 'active' : ''; ?>">Perfil</a>
+            <a href="logout.php" class="block nav-link px-3 py-2 text-base font-medium text-white rounded-md">Salir</a>
         </div>
     </div>
 </nav>
+
