@@ -100,16 +100,43 @@
         let userCountsChart = null;
         let stockDifferenceChart = null;
 
-        const createTable = (headers, data, containerId) => { /* ... (código sin cambios) ... */ };
+        const createTable = (headers, data, containerId) => {
+            const container = document.getElementById(containerId);
+            if (!container) return;
 
-        // --- **NUEVA FUNCIÓN PARA RENDERIZAR GRÁFICA DE USUARIOS** ---
+            if (data.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-slate-500">No hay datos para mostrar.</div>`;
+                return;
+            }
+
+            let tableHtml = '<table class="w-full text-left text-sm">';
+            tableHtml += '<thead><tr class="border-b-2 border-slate-200">';
+            headers.forEach(h => tableHtml += `<th class="p-3 font-semibold text-slate-600">${h.label}</th>`);
+            tableHtml += '</tr></thead><tbody>';
+
+            data.forEach(row => {
+                tableHtml += '<tr class="border-b border-slate-100 hover:bg-slate-50">';
+                headers.forEach(h => {
+                    let value = row[h.key] ?? 'N/A';
+                    if (h.format) {
+                        value = h.format(row);
+                    }
+                    tableHtml += `<td class="p-3 text-slate-700">${value}</td>`;
+                });
+                tableHtml += '</tr>';
+            });
+
+            tableHtml += '</tbody></table>';
+            container.innerHTML = tableHtml;
+        };
+
         const renderUserCountsChart = (summaryData) => {
             const ctx = document.getElementById('userCountsChart').getContext('2d');
             const labels = Object.keys(summaryData.countsByUser);
             const data = Object.values(summaryData.countsByUser);
 
             if (userCountsChart) {
-                userCountsChart.destroy(); // Destroy previous chart instance
+                userCountsChart.destroy();
             }
 
             userCountsChart = new Chart(ctx, {
@@ -127,24 +154,12 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1 // Only show whole numbers
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    }
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                    plugins: { legend: { display: false } }
                 }
             });
         };
 
-        // --- **NUEVA FUNCIÓN PARA RENDERIZAR GRÁFICA DE DIFERENCIAS** ---
         const renderStockDifferenceChart = (summaryData) => {
             const ctx = document.getElementById('stockDifferenceChart').getContext('2d');
             const data = summaryData.stockComparison;
@@ -160,29 +175,17 @@
                     datasets: [{
                         label: 'Unidades Totales',
                         data: [data.system, data.counted],
-                        backgroundColor: [
-                            'rgba(100, 116, 139, 0.6)', // slate-500
-                            'rgba(234, 88, 12, 0.6)'   // orange-500
-                        ],
-                        borderColor: [
-                            'rgba(100, 116, 139, 1)',
-                            'rgba(234, 88, 12, 1)'
-                        ],
+                        backgroundColor: ['rgba(100, 116, 139, 0.6)', 'rgba(234, 88, 12, 0.6)'],
+                        borderColor: ['rgba(100, 116, 139, 1)', 'rgba(234, 88, 12, 1)'],
                         borderWidth: 1
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    },
+                    scales: { y: { beginAtZero: true } },
                     plugins: {
-                        legend: {
-                            display: false
-                        },
+                        legend: { display: false },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
@@ -198,10 +201,8 @@
 
         const loadInventoryData = async () => {
             try {
-                // Modificado para obtener la respuesta completa
                 const response = await fetch('https://grammermx.com/Logistica/QuickInventories/dao/get_inventory_summary.php');
 
-                // Mejor manejo de errores
                 if (!response.ok) {
                     const errorText = await response.text();
                     throw new Error(`Error del servidor: ${response.status} ${response.statusText}. Respuesta: ${errorText}`);
@@ -211,15 +212,21 @@
 
                 if (result.success) {
                     const allData = result.data;
-                    const summary = result.summary; // **OBTENER DATOS DE RESUMEN**
+                    const summary = result.summary;
 
                     analysisDataForExport = allData;
 
-                    // --- **LLAMAR A LAS FUNCIONES PARA RENDERIZAR GRÁFICAS** ---
-                    renderUserCountsChart(summary);
-                    renderStockDifferenceChart(summary);
+                    // --- **CAMBIO CLAVE: Validar que el objeto summary exista antes de usarlo** ---
+                    if (summary && summary.countsByUser && summary.stockComparison) {
+                        renderUserCountsChart(summary);
+                        renderStockDifferenceChart(summary);
+                    } else {
+                        console.warn("Datos de resumen para las gráficas no encontrados. Las gráficas no se mostrarán.");
+                        // Opcional: Ocultar la sección de gráficas si no hay datos
+                        const chartsSection = document.querySelector('.lg\\:grid-cols-2');
+                        if(chartsSection) chartsSection.style.display = 'none';
+                    }
 
-                    // --- El resto del código para las tablas sigue igual ---
                     const pending = allData.filter(item => item.Estado == '0');
                     const captured = allData.filter(item => item.Estado == '1');
                     const newSystem = allData.filter(item => item.Estado == '2');
@@ -230,8 +237,24 @@
 
                     const analysisHeaders = [
                         { label: 'Material', key: 'Material' }, { label: 'Descripción', key: 'Description' }, { label: 'Ubicación', key: 'StorageBin' }, { label: 'SUN', key: 'Sun' }, { label: 'Stock Sistema', key: 'AvadaibleStock' }, { label: 'Cant. Contada', key: 'CantidadContada' }, { label: 'UM', key: 'UnidadMedida' },
-                        { label: 'Cumplimiento', key: 'Cumplimiento', format: (row) => { /* ... */ } },
-                        { label: 'Costo Total Contado', key: 'CostoTotalContado', format: (row) => { /* ... */ } },
+                        {
+                            label: 'Cumplimiento', key: 'Cumplimiento',
+                            format: (row) => {
+                                const available = parseFloat(row.AvadaibleStock); const counted = parseFloat(row.CantidadContada);
+                                if (isNaN(available) || isNaN(counted)) return '<span class="text-slate-400">N/A</span>';
+                                if (available > 0) { const percentage = (counted / available) * 100; const color = percentage < 95 ? 'text-red-500' : (percentage > 105 ? 'text-blue-500' : 'text-green-500'); return `<span class="font-bold ${color}">${percentage.toFixed(1)}%</span>`; }
+                                if (available === 0 && counted === 0) return '<span class="font-bold text-green-500">100%</span>';
+                                return '<span class="font-bold text-sky-500">Extra</span>';
+                            }
+                        },
+                        {
+                            label: 'Costo Total Contado', key: 'CostoTotalContado',
+                            format: (row) => {
+                                const cost = parseFloat(row.CostoTotalContado);
+                                if (isNaN(cost)) return '<span class="text-slate-400">N/A</span>';
+                                return cost.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
+                            }
+                        },
                         { label: 'Contador', key: 'UsuarioContador' }
                     ];
 
@@ -243,16 +266,46 @@
                 } else { throw new Error(result.message); }
             } catch (error) {
                 console.error('Error loading inventory data:', error);
-                // ... (código de manejo de errores sin cambios) ...
+                const containers = ['pending-table-container', 'captured-table-container', 'new-system-table-container', 'analysis-table-container'];
+                containers.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.innerHTML = `<div class="text-center py-10 text-red-500">Error al cargar los datos: ${error.message}</div>`;
+                });
             }
         };
 
         const downloadBtn = document.getElementById('download-excel-btn');
         if (downloadBtn) {
-            downloadBtn.addEventListener('click', () => { /* ... (código sin cambios) ... */ });
+            downloadBtn.addEventListener('click', () => {
+                if (analysisDataForExport.length === 0) {
+                    Swal.fire('Atención', 'No hay datos para exportar.', 'warning');
+                    return;
+                }
+                const exportData = analysisDataForExport.map(row => {
+                    const available = parseFloat(row.AvadaibleStock); const counted = parseFloat(row.CantidadContada);
+                    let compliance = 'N/A';
+                    if (!isNaN(available) && !isNaN(counted)) {
+                        if (available > 0) { compliance = `${((counted / available) * 100).toFixed(1)}%`; }
+                        else if (available === 0 && counted === 0) { compliance = '100%'; }
+                        else { compliance = 'Extra'; }
+                    }
+                    const totalCost = parseFloat(row.CostoTotalContado);
+                    return {
+                        'Material': row.Material, 'Descripción': row.Description, 'Ubicación': row.StorageBin, 'SUN': row.Sun, 'Stock Sistema': available, 'Cant. Contada': counted, 'UM': row.UnidadMedida, 'Cumplimiento': compliance, 'Costo Total Contado (MXN)': !isNaN(totalCost) ? totalCost : 'N/A', 'Contador': row.UsuarioContador, 'Comentario': row.Comentario,
+                    };
+                });
+                const worksheet = XLSX.utils.json_to_sheet(exportData);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Análisis de Inventario");
+                const cols = Object.keys(exportData[0] || {});
+                const colWidths = cols.map(key => ({ wch: Math.max(key.length, ...exportData.map(row => String(row[key] ?? '').length)) + 2 }));
+                worksheet['!cols'] = colWidths;
+                XLSX.writeFile(workbook, "Analisis_Inventario.xlsx");
+            });
         }
         loadInventoryData();
     });
 </script>
 </body>
 </html>
+
