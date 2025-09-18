@@ -93,6 +93,8 @@
     </div>
 </main>
 
+<?php include 'estaticos/footer.php'; ?>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
 

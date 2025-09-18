@@ -106,6 +106,8 @@
     </div>
 </main>
 
+<?php include 'estaticos/footer.php'; ?>
+
 <script>
     // --- State and DOM Elements ---
     const fileInput = document.getElementById('lx02-file');
