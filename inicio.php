@@ -41,14 +41,14 @@
         <!-- Chart 1: Counts by User -->
         <div class="bg-white p-6 rounded-2xl shadow-lg">
             <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">Registros Contados por Usuario</h3>
-            <div>
+            <div class="h-64">
                 <canvas id="userCountsChart"></canvas>
             </div>
         </div>
         <!-- Chart 2: Stock Difference -->
         <div class="bg-white p-6 rounded-2xl shadow-lg">
             <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">Comparativa de Stock Total</h3>
-            <div>
+            <div class="h-64">
                 <canvas id="stockDifferenceChart"></canvas>
             </div>
         </div>
@@ -96,7 +96,6 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
 
-        // --- Chart instances (to prevent duplicates) ---
         let userCountsChart = null;
         let stockDifferenceChart = null;
 
@@ -118,9 +117,7 @@
                 tableHtml += '<tr class="border-b border-slate-100 hover:bg-slate-50">';
                 headers.forEach(h => {
                     let value = row[h.key] ?? 'N/A';
-                    if (h.format) {
-                        value = h.format(row);
-                    }
+                    if (h.format) { value = h.format(row); }
                     tableHtml += `<td class="p-3 text-slate-700">${value}</td>`;
                 });
                 tableHtml += '</tr>';
@@ -131,15 +128,20 @@
         };
 
         const renderUserCountsChart = (summaryData) => {
-            const ctx = document.getElementById('userCountsChart').getContext('2d');
+            const canvas = document.getElementById('userCountsChart');
+            const container = canvas.parentElement;
+
+            if (!summaryData.countsByUser || Object.keys(summaryData.countsByUser).length === 0) {
+                container.innerHTML = '<div class="text-center h-full flex items-center justify-center text-slate-500">No hay conteos de usuarios para mostrar.</div>';
+                return;
+            }
+
             const labels = Object.keys(summaryData.countsByUser);
             const data = Object.values(summaryData.countsByUser);
 
-            if (userCountsChart) {
-                userCountsChart.destroy();
-            }
+            if (userCountsChart) userCountsChart.destroy();
 
-            userCountsChart = new Chart(ctx, {
+            userCountsChart = new Chart(canvas.getContext('2d'), {
                 type: 'bar',
                 data: {
                     labels: labels,
@@ -161,14 +163,12 @@
         };
 
         const renderStockDifferenceChart = (summaryData) => {
-            const ctx = document.getElementById('stockDifferenceChart').getContext('2d');
+            const canvas = document.getElementById('stockDifferenceChart');
             const data = summaryData.stockComparison;
 
-            if (stockDifferenceChart) {
-                stockDifferenceChart.destroy();
-            }
+            if (stockDifferenceChart) stockDifferenceChart.destroy();
 
-            stockDifferenceChart = new Chart(ctx, {
+            stockDifferenceChart = new Chart(canvas.getContext('2d'), {
                 type: 'bar',
                 data: {
                     labels: ['Stock en Sistema', 'Stock Contado'],
@@ -216,15 +216,15 @@
 
                     analysisDataForExport = allData;
 
-                    // --- **CAMBIO CLAVE: Validar que el objeto summary exista antes de usarlo** ---
                     if (summary && summary.countsByUser && summary.stockComparison) {
                         renderUserCountsChart(summary);
                         renderStockDifferenceChart(summary);
                     } else {
-                        console.warn("Datos de resumen para las gráficas no encontrados. Las gráficas no se mostrarán.");
-                        // Opcional: Ocultar la sección de gráficas si no hay datos
-                        const chartsSection = document.querySelector('.lg\\:grid-cols-2');
-                        if(chartsSection) chartsSection.style.display = 'none';
+                        console.warn("Datos de resumen para las gráficas no encontrados.");
+                        const userChartContainer = document.getElementById('userCountsChart').parentElement;
+                        const stockChartContainer = document.getElementById('stockDifferenceChart').parentElement;
+                        userChartContainer.innerHTML = '<div class="text-center h-full flex items-center justify-center text-slate-500">No se pudieron cargar los datos de la gráfica.</div>';
+                        stockChartContainer.innerHTML = '<div class="text-center h-full flex items-center justify-center text-slate-500">No se pudieron cargar los datos de la gráfica.</div>';
                     }
 
                     const pending = allData.filter(item => item.Estado == '0');
