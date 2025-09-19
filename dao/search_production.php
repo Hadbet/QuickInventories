@@ -1,36 +1,53 @@
 <?php
 header('Content-Type: application/json');
-include_once('db/db_Inventario.php'); // Asegúrate que la ruta sea correcta
+include_once('db/db_Inventario.php'); // Asegúrate que la ruta a tu conexión sea correcta.
 
-$response = ['success' => false, 'message' => 'Parámetros inválidos.'];
+$response = ['success' => false, 'data' => null, 'message' => ''];
 
-if (isset($_GET['material']) && isset($_GET['storagebin'])) {
+// Validar que los parámetros GET no estén vacíos
+if (empty($_GET['material']) || empty($_GET['storagebin'])) {
+    $response['message'] = 'El número de parte y el Storage Bin son requeridos.';
+    echo json_encode($response);
+    exit;
+}
+
+try {
+    $con = new LocalConector();
+    $conex = $con->conectar();
+
     $material = $_GET['material'];
-    $storagebin = $_GET['storagebin'];
+    $storageBin = $_GET['storagebin'];
 
-    try {
-        $con = new LocalConector();
-        $conex = $con->conectar();
+    // Consulta para obtener el registro, incluyendo el campo 'Estado'
+    $stmt = $conex->prepare("SELECT `IdInventario`, `Description`, `UnidadMedida`, `StorageType`, `Estado` FROM `Inventario` WHERE `Material` = ? AND `StorageBin` = ?");
+    $stmt->bind_param("ss", $material, $storageBin);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-        // Usar sentencias preparadas para seguridad
-        $stmt = $conex->prepare("SELECT `IdInventario`, `Description`, `UnidadMedida`, `StorageType` FROM `Inventario` WHERE `Material` = ? AND `StorageBin` = ? LIMIT 1");
-        $stmt->bind_param("ss", $material, $storagebin);
-        $stmt->execute();
-        $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        $data = $result->fetch_assoc();
 
-        if ($result->num_rows > 0) {
-            $data = $result->fetch_assoc();
-            $response = ['success' => true, 'data' => $data];
+        // **CAMBIO CLAVE: Verificación del estado del registro**
+        if ($data['Estado'] == '1') {
+            // Si el estado es 1, el registro ya fue capturado.
+            $response['success'] = false;
+            $response['message'] = 'Este material ya ha sido capturado en esta ubicación y no se puede modificar.';
         } else {
-            $response['message'] = 'No se encontró ningún material con esos criterios.';
+            // Si el estado no es 1, se envían los datos para la captura.
+            $response['success'] = true;
+            $response['data'] = $data;
         }
 
-        $stmt->close();
-        $conex->close();
-    } catch (Exception $e) {
-        http_response_code(500);
-        $response['message'] = 'Error en el servidor: ' . $e->getMessage();
+    } else {
+        $response['message'] = 'Material no encontrado en la ubicación especificada.';
     }
+
+    $stmt->close();
+    $conex->close();
+
+} catch (Exception $e) {
+    http_response_code(500);
+    $response['message'] = 'Error en la base de datos: ' . $e->getMessage();
 }
 
 echo json_encode($response);
