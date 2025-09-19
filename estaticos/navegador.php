@@ -38,7 +38,7 @@ $userRol = isset($_SESSION['rol']) ? $_SESSION['rol'] : 0;
                 <?php endif; ?>
 
                 <a href="perfil.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md <?php echo ($currentPage == 'perfil.php') ? 'active' : ''; ?>"><span>Perfil</span></a>
-                <a href="logout.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md"><span>Salir</span></a>
+                <a href="dao/logout.php" class="nav-link flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-md"><span>Salir</span></a>
 
             </div>
             <!-- Mobile Menu Button -->
