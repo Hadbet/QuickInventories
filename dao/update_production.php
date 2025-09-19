@@ -9,7 +9,7 @@ if (isset($data['IdInventario']) && isset($data['CantidadContada'])) {
     $idInventario = $data['IdInventario'];
     $cantidadContada = $data['CantidadContada'];
     $comentario = $data['Comentario'] ?? ''; // Usar operador de fusión de null
-    $usuarioContador = "hadbet"; // Usuario fijo temporalmente
+    $usuarioContador = $_SESSION['nombre']; // Usuario fijo temporalmente
     $estado = '1';
 
     // Validación básica
@@ -19,12 +19,16 @@ if (isset($data['IdInventario']) && isset($data['CantidadContada'])) {
         exit;
     }
 
+    $Object = new DateTime();
+    $Object->setTimezone(new DateTimeZone('America/Denver')); // Considera usar 'America/Mexico_City' si aplica
+    $DateAndTime = $Object->format("Y-m-d H:i:s");
+
     try {
         $con = new LocalConector();
         $conex = $con->conectar();
 
-        $stmt = $conex->prepare("UPDATE `Inventario` SET `CantidadContada` = ?, `UsuarioContador` = ?, `Comentario` = ?, `Estado` = ? WHERE `IdInventario` = ?");
-        $stmt->bind_param("dsssi", $cantidadContada, $usuarioContador, $comentario, $estado, $idInventario);
+        $stmt = $conex->prepare("UPDATE `Inventario` SET `CantidadContada` = ?, `UsuarioContador` = ?, `Comentario` = ?, `Estado` = ?, `FechaCaptura` = ? WHERE `IdInventario` = ?");
+        $stmt->bind_param("dsssis", $cantidadContada, $usuarioContador, $comentario, $estado, $idInventario,$DateAndTime);
 
         if ($stmt->execute()) {
             if ($stmt->affected_rows > 0) {

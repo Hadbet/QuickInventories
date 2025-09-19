@@ -18,12 +18,16 @@ try {
 
     // El estado 1 significa que fue contado/actualizado
     $estado = 1;
-    $usuario = "Hadbet"; // Usuario fijo por el momento
+    $usuario = $_SESSION['nombre']; // Usuario fijo por el momento
 
-    $stmt = $conex->prepare("UPDATE `Inventario` SET `CantidadContada`= ?, `UsuarioContador`= ?, `Comentario`= ?, `Estado`= ? WHERE `IdInventario` = ?");
+    $Object = new DateTime();
+    $Object->setTimezone(new DateTimeZone('America/Denver')); // Considera usar 'America/Mexico_City' si aplica
+    $DateAndTime = $Object->format("Y-m-d H:i:s");
+
+    $stmt = $conex->prepare("UPDATE `Inventario` SET `CantidadContada`= ?, `UsuarioContador`= ?, `Comentario`= ?, `Estado`= ?, `FechaCaptura` = ? WHERE `IdInventario` = ?");
 
     foreach ($input as $item) {
-        $stmt->bind_param("dssii", $item['CantidadContada'], $usuario, $item['Comentario'], $estado, $item['IdInventario']);
+        $stmt->bind_param("dssii", $item['CantidadContada'], $usuario, $item['Comentario'], $estado,$DateAndTime, $item['IdInventario']);
         $stmt->execute();
     }
 
