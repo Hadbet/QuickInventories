@@ -28,7 +28,7 @@ if (isset($data['IdInventario']) && isset($data['CantidadContada'])) {
         $conex = $con->conectar();
 
         $stmt = $conex->prepare("UPDATE `Inventario` SET `CantidadContada` = ?, `UsuarioContador` = ?, `Comentario` = ?, `Estado` = ?, `FechaCaptura` = ? WHERE `IdInventario` = ?");
-        $stmt->bind_param("dsssis", $cantidadContada, $usuarioContador, $comentario, $estado, $idInventario,$DateAndTime);
+        $stmt->bind_param("dsssis", $cantidadContada, $usuarioContador, $comentario, $estado,$DateAndTime, $idInventario);
 
         if ($stmt->execute()) {
             if ($stmt->affected_rows > 0) {
