@@ -27,7 +27,7 @@ try {
     $stmt = $conex->prepare("UPDATE `Inventario` SET `CantidadContada`= ?, `UsuarioContador`= ?, `Comentario`= ?, `Estado`= ?, `FechaCaptura` = ? WHERE `IdInventario` = ?");
 
     foreach ($input as $item) {
-        $stmt->bind_param("dssii", $item['CantidadContada'], $usuario, $item['Comentario'], $estado,$DateAndTime, $item['IdInventario']);
+        $stmt->bind_param("dssisi", $item['CantidadContada'], $usuario, $item['Comentario'], $estado,$DateAndTime, $item['IdInventario']);
         $stmt->execute();
     }
 
