@@ -8,7 +8,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['rol'] != '1') {
     exit;
 }
 
-include_once('../db/db_Inventario.php');
+include_once('db/db_Inventario.php');
 
 $response = ['success' => false, 'message' => ''];
 
