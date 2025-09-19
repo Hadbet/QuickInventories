@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json');
 include_once('db/db_Inventario.php'); // Asegúrate que la ruta sea correcta
-
+session_start();
 $response = ['success' => false, 'message' => 'Datos inválidos.'];
 $data = json_decode(file_get_contents('php://input'), true);
 

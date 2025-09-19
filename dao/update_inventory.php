@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json');
 include_once('db/db_Inventario.php');
-
+session_start();
 $response = ['success' => false, 'message' => ''];
 $input = json_decode(file_get_contents('php://input'), true);
 
