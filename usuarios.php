@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Usuarios - Grammer Quick Inventor</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <?php include 'estaticos/stylesEstandar.php'; ?>
     <style>
         .nav-link.active { @apply bg-white/20 rounded-md; }
         .swal2-input, .swal2-select {

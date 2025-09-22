@@ -5,8 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Perfil - Grammer Quick Inventor</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <?php include 'estaticos/stylesEstandar.php'; ?>
     <style>
         .nav-link.active { @apply bg-white/20 rounded-md; }
     </style>
